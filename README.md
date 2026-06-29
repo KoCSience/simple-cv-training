@@ -4,6 +4,29 @@ CNN/ViT を使って学習する単純な練習用コードです．
 
 ## 準備
 
+uvを使うことを推奨しています。
+
+インストール方法 (installation)
+
+- 仮想環境の作成
+  - `uv venv`
+- パッケージ依存関係と仮想環境を同期する (パッケージインストール)
+  - `uv sync`
+- パッケージ依存関係を記述したlockfileを生成する
+  - `uv lock`
+- (仮想環境上にて) スクリプトを実行する。\
+  → 毎回venv環境に入らなくて良い
+  - `uv run <command>`
+
+### 実行例
+
+```shell
+uv run python3 main.py -w 24 -b 8 -e 5 -d ImageFolder -r /mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/  --use_dp --disable_comet  # no comet
+uv run python3 main_pl.py -w 24 -b 8 -e 5 -d ImageFolder -r /mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ --devices 3 --disable_comet # no comet
+```
+
+### 旧
+
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
@@ -196,4 +219,22 @@ cli_arguments=True
     exp_name = datetime.now().strftime('%Y-%m-%d_%H:%M:%S:%f')  # これは日時をexperiment nameに設定する例．
     experiment.set_name(exp_name)
     experiment.add_tag(args.model)  # これはモデル名をタグに設定する例．
+```
+
+---
+
+## 管理ファイル
+
+- `.python-version`: Pythonのバージョンの指定
+- `pyproject.toml`: プロジェクトのメタデータ、パッケージ依存関係を記述 \
+  [PEP 621 – Storing project metadata in pyproject.toml | peps.python.org](https://peps.python.org/pep-0621/)
+- `uv.lock`: パッケージのバージョンの指定
+- `config/config.yaml`: パラメーターツールHydraを使っています。引数設定はここを触る。
+
+## テスト環境
+
+PyTestが入っています。
+
+```shell
+uv run python3 -m pytest test/dataset
 ```
