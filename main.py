@@ -1,5 +1,6 @@
 import argparse
 
+from omegaconf import DictConfig, OmegaConf
 from tqdm import tqdm
 
 import torch
@@ -35,6 +36,26 @@ class TqdmEpoch(tqdm):
         )
 
 
+def build_dataloader_cfg_from_args(args: argparse.Namespace) -> DictConfig:
+    """Build the nested dataloader config expected by configure_dataloader."""
+    return OmegaConf.create({
+        "dataset": {
+            "root": args.root,
+            "train_dir": args.train_dir,
+            "val_dir": args.val_dir,
+        },
+        "training": {
+            "batch_size": args.batch_size,
+            "num_workers": args.num_workers,
+        },
+        "video": {
+            "frames_per_clip": args.frames_per_clip,
+            "clip_duration": args.clip_duration,
+            "clips_per_video": args.clips_per_video,
+        },
+    })
+
+
 def prepare_training(args: argparse.Namespace):
     """prepare training objects from args
 
@@ -52,7 +73,7 @@ def prepare_training(args: argparse.Namespace):
     )
 
     dataloaders = configure_dataloader(
-        command_line_args=args,
+        command_line_cfg=build_dataloader_cfg_from_args(args),
         dataset_name=args.dataset_name,
     )
 
