@@ -29,6 +29,8 @@
         "sirtori.indenticator",
         "usernamehw.errorlens",
         "yzhang.markdown-all-in-one",
-        "zainchen.json"
+        "zainchen.json",
+        "charliermarsh.ruff",
+        "tamasfe.even-better-toml"
     ]
 }
