@@ -17,6 +17,13 @@ def main() -> None:
 
         train_main()
         return
+    if command == "doctor":
+        _add_workspace_to_import_path()
+        from simple_cv_core.doctor.checks import format_doctor_results, has_failures, run_doctor
+
+        results = run_doctor(sys.argv[2:] or None)
+        print(format_doctor_results(results))
+        raise SystemExit(1 if has_failures(results) else 0)
 
     _print_help()
     raise SystemExit(f"unknown scv command: {command}")
@@ -27,6 +34,7 @@ def _print_help() -> None:
     print("")
     print("commands:")
     print("  train    run Lightning training")
+    print("  doctor   run repository health checks")
 
 
 def _add_workspace_to_import_path() -> None:

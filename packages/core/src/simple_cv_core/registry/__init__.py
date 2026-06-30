@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import warnings
 from collections.abc import Callable
 from typing import TypeVar
-import warnings
 
 T = TypeVar("T")
 

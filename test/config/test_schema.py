@@ -8,7 +8,6 @@ from pydantic import ValidationError
 
 from config import validate_experiment_config
 
-
 CONFIG_DIR = str(Path("configs").resolve())
 
 

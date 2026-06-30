@@ -1,0 +1,10 @@
+defaults:
+  - _self_
+  - data: zero_images
+  - model: zero_output_dummy
+  - optimizer: sgd
+  - trainer: smoke
+  - mode: beginner
+
+seed: 42
+experiment_name: starter

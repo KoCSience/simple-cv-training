@@ -51,3 +51,21 @@ uv run pytest -m "not gpu and not external_data"
 - 設定値の失敗: `configs/` と Pydantic schema を確認する。
 - GPU関連の失敗: `nvidia-smi` と `torch.cuda.is_available()` を確認する。
 - checkpoint関連の失敗: 保存先、resume元、DataParallel有無を確認する。
+
+## doctor
+
+リポジトリの基本状態を確認するには次を使います。
+
+```bash
+uv run scv doctor
+```
+
+## 静的解析
+
+現段階のCIでは、新しく追加したフレームワーク層を中心に `ruff` と `basedpyright` を実行します。
+既存の練習用コード全体はまだlint/type cleanではないため、テストで互換性を守りながら段階的に対象を広げます。
+
+```bash
+uv run ruff check .
+uv run basedpyright
+```

@@ -1,0 +1,38 @@
+_subdirectory: template
+_min_copier_version: "9.0.0"
+
+familyname:
+  type: str
+  help: "Student family name in lowercase ASCII."
+  validator: "{% if not (familyname | regex_search('^[a-z]+$')) %}Use lowercase ASCII letters only.{% endif %}"
+
+description:
+  type: str
+  help: "Project description such as cls-resnet50-cifar10."
+  validator: "{% if not (description | regex_search('^[a-z0-9-]+$')) %}Use lowercase ASCII letters, digits, and hyphens only.{% endif %}"
+
+created_at_month:
+  type: int
+  help: "Project creation month."
+  default: 4
+
+created_at_year:
+  type: int
+  default: 2026
+
+naming_style:
+  type: str
+  choices:
+    YYYYMM_familyname_description: YYYYMM
+    YYYY_MM_familyname_description: YYYY_MM
+  default: YYYYMM_familyname_description
+
+namespace:
+  default: "{{ familyname }}"
+  when: false
+
+repo_name:
+  default: >-
+    {% set ym = '%04d%02d' % (created_at_year, created_at_month) if naming_style == 'YYYYMM_familyname_description' else '%04d_%02d' % (created_at_year, created_at_month) -%}
+    {{ ym }}_{{ familyname }}_{{ description }}
+  when: false

@@ -30,3 +30,15 @@
 - optimizer名とmodel名は許可リストで検証する。
 - checkpoint resume元は存在するファイルか確認する。
 - 秘密情報は設定schemaに含めない。
+
+## Snapshot
+
+学習開始時に `snapshots/<experiment_name>/snapshot.json` と `config.yaml` を保存します。
+
+主な記録内容:
+
+- framework package version
+- git commit と dirty状態
+- `uv.lock` のsha256
+- Python、OS、CUDA、GPU
+- Hydraで合成された設定

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import pytest
+from collections.abc import Callable
 
+import pytest
 from simple_cv_core.registry import Registry, RegistryConflictError, RegistryLookupError
 
 
@@ -11,6 +12,7 @@ def test_registry_returns_registered_item() -> None:
 
     builder = registry.get("item")
 
+    assert isinstance(builder, Callable)
     assert builder() == "value"
 
 

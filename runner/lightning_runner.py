@@ -1,9 +1,10 @@
 from __future__ import annotations
 
-import torch
 import lightning.pytorch as pl
+import torch
 from lightning.pytorch.plugins import TorchSyncBatchNorm
 from omegaconf import DictConfig
+from simple_cv_core.logging import ExperimentSnapshotCallback
 
 from callback import configure_callbacks
 from config import validate_experiment_config
@@ -41,6 +42,10 @@ def run_lightning_training(cfg: DictConfig) -> None:
 
 
 def build_trainer(cfg: DictConfig, loggers) -> pl.Trainer:
+    callbacks = [
+        *configure_callbacks(),
+        ExperimentSnapshotCallback(cfg, f"snapshots/{cfg.experiment_name}"),
+    ]
     return pl.Trainer(
         devices=cfg.GPU.devices,
         accelerator="gpu",
@@ -50,7 +55,7 @@ def build_trainer(cfg: DictConfig, loggers) -> pl.Trainer:
         log_every_n_steps=cfg.training.log_interval_steps,
         accumulate_grad_batches=cfg.optimizer.grad_accum,
         num_sanity_val_steps=0,
-        callbacks=configure_callbacks(),
+        callbacks=callbacks,
         plugins=[TorchSyncBatchNorm()],
     )
 

@@ -58,6 +58,23 @@ line-length = 120
 [tool.ruff]
 line-length = 120
 target-version = "py312"
+extend-exclude = [
+    "args",
+    "callback",
+    "dataset",
+    "logger",
+    "model",
+    "setup",
+    "test/dataset",
+    "test/model",
+    "test/setup",
+    "test/utils",
+    "utils",
+    "display_environment.py",
+    "main.py",
+    "train.py",
+    "val.py",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
@@ -66,6 +83,14 @@ ignore = ["E501"]
 [tool.basedpyright]
 pythonVersion = "3.12"
 typeCheckingMode = "basic"
+include = [
+    "config",
+    "packages/core/src/simple_cv_core",
+    "test/config",
+    "test/doctor",
+    "test/logging",
+    "test/registry",
+]
 exclude = [
     ".venv",
     "log",
@@ -73,6 +98,8 @@ exclude = [
     "tf_logs",
     "downloaded_data",
     "pretrained_models",
+    "packages/core/src/simple_cv_core/runner",
+    "packages/vision",
 ]
 
 [tool.uv.sources]
@@ -93,7 +120,9 @@ explicit = true
 
 [dependency-groups]
 dev = [
+    "basedpyright>=1.18",
     "pytest>=9.1.1",
     "pytest-cov>=7.1.0",
+    "ruff>=0.6",
 ]
 # ref: uv https://docs.astral.sh/uv/guides/integration/pytorch/#installing-pytorch

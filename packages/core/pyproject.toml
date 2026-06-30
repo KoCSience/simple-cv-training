@@ -5,8 +5,10 @@ description = "Core configuration, runner, registry, and diagnostics for simple_
 requires-python = ">=3.12"
 dependencies = [
     "hydra-core>=1.3.3",
+    "lightning>=2.6.1",
     "omegaconf>=2.3.0",
     "pydantic>=2.12,<3",
+    "torch>=2.11.0",
 ]
 
 [project.scripts]
