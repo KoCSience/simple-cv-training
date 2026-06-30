@@ -4,6 +4,8 @@ from dataclasses import dataclass
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader
 
+from simple_cv_core.registry import get_dataset, register_dataset
+
 from dataset import (
     cifar10,
     Cifar10Info,
@@ -36,6 +38,66 @@ class DataloadersInfo:
 SupportedDatasets = Literal["CIFAR10", "ImageFolder", "VideoFolder", "ZeroImages"]
 
 
+def _build_cifar10(cfg: DictConfig) -> DataloadersInfo:
+    train_transform, val_transform = transform_image(TransformImageInfo())
+    train_loader, val_loader, n_classes = cifar10(Cifar10Info(
+        root=cfg.dataset.root,
+        batch_size=cfg.training.batch_size,
+        num_workers=cfg.training.num_workers,
+        train_transform=train_transform,
+        val_transform=val_transform,
+    ))
+    return DataloadersInfo(train_loader=train_loader, val_loader=val_loader, n_classes=n_classes)
+
+
+def _build_image_folder(cfg: DictConfig) -> DataloadersInfo:
+    train_transform, val_transform = transform_image(TransformImageInfo())
+    train_loader, val_loader, n_classes = image_folder(ImageFolderInfo(
+        root=cfg.dataset.root,
+        train_dir=cfg.dataset.train_dir,
+        val_dir=cfg.dataset.val_dir,
+        batch_size=cfg.training.batch_size,
+        num_workers=cfg.training.num_workers,
+        train_transform=train_transform,
+        val_transform=val_transform,
+    ))
+    return DataloadersInfo(train_loader=train_loader, val_loader=val_loader, n_classes=n_classes)
+
+
+def _build_video_folder(cfg: DictConfig) -> DataloadersInfo:
+    train_transform, val_transform = transform_video(TransformVideoInfo(
+        frames_per_clip=cfg.video.frames_per_clip,
+    ))
+    train_loader, val_loader, n_classes = video_folder(VideoFolderInfo(
+        root=cfg.dataset.root,
+        train_dir=cfg.dataset.train_dir,
+        val_dir=cfg.dataset.val_dir,
+        batch_size=cfg.training.batch_size,
+        num_workers=cfg.training.num_workers,
+        train_transform=train_transform,
+        val_transform=val_transform,
+        clip_duration=cfg.video.clip_duration,
+        clips_per_video=cfg.video.clips_per_video,
+    ))
+    return DataloadersInfo(train_loader=train_loader, val_loader=val_loader, n_classes=n_classes)
+
+
+def _build_zero_images(cfg: DictConfig) -> DataloadersInfo:
+    train_transform, _ = transform_image(TransformImageInfo())
+    train_loader, val_loader, n_classes = zero_images(ZeroImageInfo(
+        batch_size=cfg.training.batch_size,
+        num_workers=cfg.training.num_workers,
+        transform=train_transform,
+    ))
+    return DataloadersInfo(train_loader=train_loader, val_loader=val_loader, n_classes=n_classes)
+
+
+register_dataset("CIFAR10")(_build_cifar10)
+register_dataset("ImageFolder")(_build_image_folder)
+register_dataset("VideoFolder")(_build_video_folder)
+register_dataset("ZeroImages")(_build_zero_images)
+
+
 def configure_dataloader(
     command_line_cfg: DictConfig,
     dataset_name: SupportedDatasets,
@@ -54,67 +116,5 @@ def configure_dataloader(
         (DataloadersInfo): dataset information
     """
 
-    cfg = command_line_cfg
-
-    if dataset_name == "CIFAR10":
-        train_transform, val_transform = \
-            transform_image(TransformImageInfo())
-        train_loader, val_loader, n_classes = \
-            cifar10(Cifar10Info(
-                root=cfg.dataset.root,
-                batch_size=cfg.training.batch_size,
-                num_workers=cfg.training.num_workers,
-                train_transform=train_transform,
-                val_transform=val_transform
-            ))
-
-    elif dataset_name == "ImageFolder":
-        train_transform, val_transform = \
-            transform_image(TransformImageInfo())
-        train_loader, val_loader, n_classes = \
-            image_folder(ImageFolderInfo(
-                root=cfg.dataset.root,
-                train_dir=cfg.dataset.train_dir,
-                val_dir=cfg.dataset.val_dir,
-                batch_size=cfg.training.batch_size,
-                num_workers=cfg.training.num_workers,
-                train_transform=train_transform,
-                val_transform=val_transform
-            ))
-
-    elif dataset_name == "VideoFolder":
-        train_transform, val_transform = \
-            transform_video(TransformVideoInfo(
-                frames_per_clip=cfg.video.frames_per_clip
-            ))
-        train_loader, val_loader, n_classes = \
-            video_folder(VideoFolderInfo(
-                root=cfg.dataset.root,
-                train_dir=cfg.dataset.train_dir,
-                val_dir=cfg.dataset.val_dir,
-                batch_size=cfg.training.batch_size,
-                num_workers=cfg.training.num_workers,
-                train_transform=train_transform,
-                val_transform=val_transform,
-                clip_duration=cfg.video.clip_duration,
-                clips_per_video=cfg.video.clips_per_video
-            ))
-
-    elif dataset_name == "ZeroImages":
-        train_transform, _ = \
-            transform_image(TransformImageInfo())
-        train_loader, val_loader, n_classes = \
-            zero_images(ZeroImageInfo(
-                batch_size=cfg.training.batch_size,
-                num_workers=cfg.training.num_workers,
-                transform=train_transform,
-            ))
-
-    else:
-        raise ValueError("invalid dataset_name")
-
-    return DataloadersInfo(
-        train_loader=train_loader,
-        val_loader=val_loader,
-        n_classes=n_classes
-    )
+    dataset_builder = get_dataset(dataset_name)
+    return dataset_builder(command_line_cfg)  # type: ignore[operator, no-any-return]

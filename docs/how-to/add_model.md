@@ -12,7 +12,7 @@
 
 ## 2. registryに登録する
 
-リファクタリング後は `register_model("name")` を使います。
+`register_model("name")` を使います。上流の標準モデルは `model/model_factory.py` で登録しています。
 
 ```python
 from simple_cv_core.registry import register_model
@@ -22,6 +22,8 @@ from simple_cv_core.registry import register_model
 class MyModel:
     ...
 ```
+
+既存のfactory互換APIから使う場合、登録した名前を `model.model_name` に指定します。
 
 ## 3. テストを追加する
 

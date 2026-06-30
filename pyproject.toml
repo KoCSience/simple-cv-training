@@ -35,7 +35,12 @@ dependencies = [
     "transformers[torch]>=5.5.3",
     "webdataset>=1.0.2",
     "wheel>=0.46.3",
+    "simple-cv-core",
+    "simple-cv-vision",
 ]
+
+[tool.uv.workspace]
+members = ["packages/core", "packages/vision"]
 
 # [tool.autopep8]
 # # https://github.com/hhatto/autopep8#configuration
@@ -71,6 +76,8 @@ exclude = [
 ]
 
 [tool.uv.sources]
+simple-cv-core = { workspace = true }
+simple-cv-vision = { workspace = true }
 torch = [
   { index = "pytorch-cu130", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
 ]

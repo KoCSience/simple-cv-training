@@ -1,5 +1,7 @@
 import os
 
+from simple_cv_core.registry import get_model, register_model
+
 from model import (
     ClassificationBaseModel,
     ModelConfig,
@@ -10,6 +12,14 @@ from model import (
     ViTb,
     ZeroOutputModel,
 )
+
+
+register_model("resnet18")(ResNet18)
+register_model("resnet50")(ResNet50)
+register_model("abn_r50")(ABNResNet50)
+register_model("vit_b")(ViTb)
+register_model("x3d")(X3DM)
+register_model("zero_output_dummy")(ZeroOutputModel)
 
 
 def set_torch_home(
@@ -39,25 +49,5 @@ def configure_model(
     if model_info.use_pretrained:
         set_torch_home(model_info)
 
-    if model_info.model_name == 'resnet18':
-        model = ResNet18(model_info)  # type: ignore[assignment]
-
-    elif model_info.model_name == 'resnet50':
-        model = ResNet50(model_info)  # type: ignore[assignment]
-
-    elif model_info.model_name == 'abn_r50':
-        model = ABNResNet50(model_info)  # type: ignore[assignment]
-
-    elif model_info.model_name == 'vit_b':
-        model = ViTb(model_info)  # type: ignore[assignment]
-
-    elif model_info.model_name == 'x3d':
-        model = X3DM(model_info)  # type: ignore[assignment]
-
-    elif model_info.model_name == 'zero_output_dummy':
-        model = ZeroOutputModel(model_info)  # type: ignore[assignment]
-
-    else:
-        raise ValueError('invalid model_info.model_name')
-
-    return model
+    model_builder = get_model(model_info.model_name)
+    return model_builder(model_info)  # type: ignore[operator, no-any-return]

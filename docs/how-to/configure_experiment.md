@@ -5,7 +5,7 @@
 主な入口は `configs/train.yaml` です。
 
 ```bash
-uv run python main_pl.py --cfg job
+uv run scv train --cfg job
 ```
 
 ## よく変更する項目
@@ -13,43 +13,43 @@ uv run python main_pl.py --cfg job
 データセット:
 
 ```bash
-uv run python main_pl.py dataset.dataset_name=ImageFolder dataset.root=/data/tiny-imagenet
+uv run scv train dataset.dataset_name=ImageFolder dataset.root=/data/tiny-imagenet
 ```
 
 config groupで切り替える場合:
 
 ```bash
-uv run python main_pl.py data=image_folder dataset.root=/data/tiny-imagenet
+uv run scv train data=image_folder dataset.root=/data/tiny-imagenet
 ```
 
 モデル:
 
 ```bash
-uv run python main_pl.py model.model_name=resnet50 model.use_pretrained=false
+uv run scv train model.model_name=resnet50 model.use_pretrained=false
 ```
 
 config groupで切り替える場合:
 
 ```bash
-uv run python main_pl.py model=resnet50 model.use_pretrained=false
+uv run scv train model=resnet50 model.use_pretrained=false
 ```
 
 optimizer:
 
 ```bash
-uv run python main_pl.py optimizer.optimizer_name=Adam optimizer.lr=1e-4
+uv run scv train optimizer.optimizer_name=Adam optimizer.lr=1e-4
 ```
 
 config groupで切り替える場合:
 
 ```bash
-uv run python main_pl.py optimizer=adam optimizer.lr=1e-4
+uv run scv train optimizer=adam optimizer.lr=1e-4
 ```
 
 学習回数:
 
 ```bash
-uv run python main_pl.py training.num_epochs=50
+uv run scv train training.num_epochs=50
 ```
 
 ## 設定変更の考え方

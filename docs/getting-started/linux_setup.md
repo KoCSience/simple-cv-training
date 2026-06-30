@@ -42,7 +42,7 @@ uv run pytest --run-gpu
 現在の互換入口では、Cometを無効にして次のように実行できます。
 
 ```bash
-uv run python main_pl.py data=zero_images trainer=smoke
+uv run scv train data=zero_images trainer=smoke
 ```
 
-リファクタリング後は `scv train` を正式入口にします。移行中は互換のため `main.py` と `main_pl.py` を残します。
+移行中は互換のため `main.py` と `main_pl.py` も残します。

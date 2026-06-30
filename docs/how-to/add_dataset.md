@@ -20,6 +20,8 @@
 
 入力パスの存在確認を行い、train/valのクラス数が一致することを確認します。
 
+標準データセットは `dataset/dataloader_factory.py` で `register_dataset("name")` に登録しています。
+
 ## 3. テストを追加する
 
 最低限確認すること:
