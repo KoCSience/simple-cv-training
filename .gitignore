@@ -9,3 +9,6 @@ hub/
 .mypy_cache/
 .pytest_cache/
 .venv*/
+
+refactor-doc/
+_GARBAGE/

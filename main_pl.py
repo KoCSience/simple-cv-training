@@ -11,9 +11,9 @@ patch_hydra_argparse_for_python314()
 
 
 @hydra.main(config_path=CONFIG_PATH, config_name=CONFIG_NAME, version_base=None)
-def main(cfg: DictConfig):
+def main(cfg: DictConfig) -> None:
     run_lightning_training(cfg)
 
 
 if __name__ == "__main__":
-    main()
+    main()  # pylint: disable=no-value-for-parameter
