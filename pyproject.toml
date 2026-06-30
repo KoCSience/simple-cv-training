@@ -23,6 +23,7 @@ dependencies = [
     "opencv-python-headless>=4.13.0.92",
     "pandas>=3.0.2",
     "pep8-naming>=0.15.1",
+    "pydantic>=2.12,<3",
     "pytorchvideo",
     "scikit-image>=0.26.0",
     "scikit-learn>=1.8.0",

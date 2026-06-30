@@ -1,0 +1,14 @@
+# @package _global_
+defaults:
+  - override /data: cifar10
+  - override /model: resnet50
+  - override /optimizer: adam
+  - override /trainer: default
+
+experiment_name: cls_resnet50_cifar10
+
+training:
+  num_epochs: 50
+
+optimizer:
+  lr: 0.0001

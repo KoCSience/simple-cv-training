@@ -1,0 +1,6 @@
+# @package _global_
+dataset:
+  root: "./downloaded_data"
+  dataset_name: "CIFAR10"
+  train_dir: "train"
+  val_dir: "val"

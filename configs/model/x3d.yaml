@@ -1,0 +1,5 @@
+# @package _global_
+model:
+  torch_home: "./pretrained_models"
+  model_name: "x3d"
+  use_pretrained: true

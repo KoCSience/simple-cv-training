@@ -1,0 +1,11 @@
+# @package _global_
+training:
+  batch_size: 8
+  num_workers: 2
+  num_epochs: 25
+  val_interval_epochs: 1
+  log_interval_steps: 1
+
+GPU:
+  use_dp: false
+  devices: "1"

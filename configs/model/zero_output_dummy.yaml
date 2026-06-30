@@ -1,0 +1,5 @@
+# @package _global_
+model:
+  torch_home: "./pretrained_models"
+  model_name: "zero_output_dummy"
+  use_pretrained: false

@@ -1,0 +1,8 @@
+# @package _global_
+mode:
+  name: "reproduce"
+  confirm_logging: false
+  seed_everything: true
+  torch_use_deterministic: true
+
+disable_comet: true

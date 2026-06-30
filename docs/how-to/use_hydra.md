@@ -12,7 +12,7 @@ uv run python main_pl.py training.num_epochs=1 disable_comet=true
 
 ## defaults list
 
-リファクタリング後は `configs/train.yaml` に defaults list を置きます。
+`configs/train.yaml` に defaults list を置きます。
 
 ```yaml
 defaults:
@@ -37,4 +37,10 @@ defaults:
 
 ```bash
 uv run python main_pl.py experiment=cls_resnet50_cifar10
+```
+
+設定の合成結果だけを見る場合:
+
+```bash
+uv run python main_pl.py --cfg job
 ```

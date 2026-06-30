@@ -1,0 +1,8 @@
+# @package _global_
+mode:
+  name: "framework-dev"
+  confirm_logging: false
+  seed_everything: false
+  torch_use_deterministic: false
+
+disable_comet: true

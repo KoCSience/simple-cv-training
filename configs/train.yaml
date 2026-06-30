@@ -1,0 +1,27 @@
+defaults:
+  - _self_
+  - data: cifar10
+  - model: resnet18
+  - optimizer: sgd
+  - trainer: default
+  - mode: beginner
+  - debug: null
+  - experiment: null
+
+seed: 42
+experiment_name: default
+
+video:
+  frames_per_clip: 16
+  clip_duration: 2.6666666666666665
+  clips_per_video: 1
+
+log_dirs:
+  comet_log_dir: "./comet_logs/"
+  tf_log_dir: "./tf_logs/"
+
+checkpoint_file:
+  save_checkpoint_dir: "./log"
+  checkpoint_to_resume: null
+
+disable_comet: false

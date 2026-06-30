@@ -1,0 +1,5 @@
+# @package _global_
+training:
+  batch_size: 2
+  num_workers: 0
+  num_epochs: 1

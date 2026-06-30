@@ -1,6 +1,6 @@
 # Config schema
 
-設定はHydraで合成し、Pydanticで型と値を検証します。
+設定はHydraで合成し、`config/schema.py` のPydantic schemaで型と値を検証します。
 
 ## 主なグループ
 
@@ -13,6 +13,16 @@
 - `log_dirs`: Comet、TensorBoardの保存先
 - `checkpoint_file`: checkpoint保存先、resume元
 - `mode`: beginner、researcher、reproduce、framework-dev
+
+## 代表的な制約
+
+- `training.batch_size`: 1以上
+- `training.num_workers`: 0以上
+- `training.num_epochs`: 1以上
+- `optimizer.lr`: 0より大きい
+- `optimizer.grad_accum`: 1以上
+- `video.frames_per_clip`: 1以上
+- `checkpoint_file.checkpoint_to_resume`: `null`、`experiment:` で始まるComet参照、または存在するファイル
 
 ## 検証方針
 

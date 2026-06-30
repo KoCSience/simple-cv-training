@@ -5,7 +5,7 @@
 ## Cometを無効にして実行する
 
 ```bash
-uv run python main_pl.py dataset.dataset_name=ZeroImages training.num_epochs=1 disable_comet=true
+uv run python main_pl.py data=zero_images trainer=smoke
 ```
 
 ## GPUを指定する
@@ -13,13 +13,13 @@ uv run python main_pl.py dataset.dataset_name=ZeroImages training.num_epochs=1 d
 Linuxでは `CUDA_VISIBLE_DEVICES` で見せるGPUを制限します。
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 uv run python main_pl.py dataset.dataset_name=ZeroImages training.num_epochs=1 disable_comet=true
+CUDA_VISIBLE_DEVICES=0 uv run python main_pl.py data=zero_images trainer=smoke
 ```
 
 複数GPUを使う場合:
 
 ```bash
-CUDA_VISIBLE_DEVICES=0,1 uv run python main_pl.py GPU.devices=2 dataset.dataset_name=ZeroImages disable_comet=true
+CUDA_VISIBLE_DEVICES=0,1 uv run python main_pl.py data=zero_images trainer=smoke GPU.devices=2
 ```
 
 ## checkpointから再開する

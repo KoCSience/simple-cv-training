@@ -8,6 +8,8 @@
 uv sync
 ```
 
+このリポジトリはPython 3.12以上を対象にしています。現在の開発環境ではPython 3.14でも動かすため、Hydra 1.3のargparse互換差分を入口側で吸収しています。
+
 lockfileと完全に一致させる確認では次を使います。
 
 ```bash
@@ -40,7 +42,7 @@ uv run pytest --run-gpu
 現在の互換入口では、Cometを無効にして次のように実行できます。
 
 ```bash
-uv run python main_pl.py dataset.dataset_name=ZeroImages training.num_epochs=1 disable_comet=true
+uv run python main_pl.py data=zero_images trainer=smoke
 ```
 
 リファクタリング後は `scv train` を正式入口にします。移行中は互換のため `main.py` と `main_pl.py` を残します。
