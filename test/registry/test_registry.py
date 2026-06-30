@@ -7,7 +7,7 @@ from simple_cv_core.registry import Registry, RegistryConflictError, RegistryLoo
 
 
 def test_registry_returns_registered_item() -> None:
-    registry = Registry("example")
+    registry: Registry[Callable[[], str]] = Registry("example")
     registry.register("item", lambda: "value")
 
     builder = registry.get("item")
@@ -17,14 +17,14 @@ def test_registry_returns_registered_item() -> None:
 
 
 def test_registry_rejects_empty_name() -> None:
-    registry = Registry("example")
+    registry: Registry[object] = Registry("example")
 
     with pytest.raises(ValueError):
         registry.register("", object())
 
 
 def test_registry_can_treat_duplicate_as_error() -> None:
-    registry = Registry("example")
+    registry: Registry[object] = Registry("example")
     registry.register("item", object())
 
     with pytest.raises(RegistryConflictError):
@@ -32,7 +32,7 @@ def test_registry_can_treat_duplicate_as_error() -> None:
 
 
 def test_registry_lists_available_names_on_lookup_error() -> None:
-    registry = Registry("example")
+    registry: Registry[object] = Registry("example")
     registry.register("known", object())
 
     with pytest.raises(RegistryLookupError, match="known"):

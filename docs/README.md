@@ -19,3 +19,4 @@
 
 - [Project structure](explanation/project_structure.md)
 - [Config schema](reference/config_schema.md)
+- [Static analysis migration](reference/static_analysis_migration.md)

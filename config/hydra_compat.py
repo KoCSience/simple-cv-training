@@ -3,6 +3,8 @@ from __future__ import annotations
 import argparse
 from typing import Any
 
+_PATCHED = False
+
 
 def patch_hydra_argparse_for_python314() -> None:
     """Make Hydra 1.3 argparse help compatible with Python 3.14.
@@ -12,7 +14,9 @@ def patch_hydra_argparse_for_python314() -> None:
     containment support keeps Hydra's parser construction working.
     """
 
-    if getattr(argparse.ArgumentParser.add_argument, "_scv_hydra_compat", False):
+    global _PATCHED
+
+    if _PATCHED:
         return
 
     original_add_argument = argparse.ArgumentParser.add_argument
@@ -27,5 +31,5 @@ def patch_hydra_argparse_for_python314() -> None:
             kwargs["help"] = str(help_value)
         return original_add_argument(self, *args, **kwargs)
 
-    add_argument_with_string_help._scv_hydra_compat = True  # type: ignore[attr-defined]
     argparse.ArgumentParser.add_argument = add_argument_with_string_help
+    _PATCHED = True

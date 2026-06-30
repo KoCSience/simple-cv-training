@@ -18,11 +18,9 @@ webdataset
 # tensorboardX
 
 
-## PEP8, lint
-flake8-fixme
-flake8-functions-names
-flake8-variables-names
-pep8-naming
+## static analysis
+ruff
+ty
 
 
 ## pytorch-related

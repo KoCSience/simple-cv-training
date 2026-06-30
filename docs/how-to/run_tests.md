@@ -62,10 +62,14 @@ uv run scv doctor
 
 ## 静的解析
 
-現段階のCIでは、新しく追加したフレームワーク層を中心に `ruff` と `basedpyright` を実行します。
+現段階のCIでは、基本的なlint、format、import order、bugbear系ルールを `ruff` で確認し、型チェックは `ty` で確認します。
+`ty` の対象は新しく追加したフレームワーク層を中心に限定しています。
 既存の練習用コード全体はまだlint/type cleanではないため、テストで互換性を守りながら段階的に対象を広げます。
 
 ```bash
 uv run ruff check .
-uv run basedpyright
+uv run ruff format --check .
+uv run ty check
 ```
+
+旧 `pep8` / `flake8` / `pylint` / `mypy` 設定からの移行差分は [static_analysis_migration.md](../reference/static_analysis_migration.md) に記録します。

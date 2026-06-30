@@ -37,9 +37,7 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
     run_gpu = config.getoption("--run-gpu")
     run_external_data = config.getoption("--run-external-data")
     skip_gpu = pytest.mark.skip(reason="GPU test skipped; pass --run-gpu to run it.")
-    skip_external_data = pytest.mark.skip(
-        reason="External data test skipped; pass --run-external-data to run it."
-    )
+    skip_external_data = pytest.mark.skip(reason="External data test skipped; pass --run-external-data to run it.")
 
     for item in items:
         path = Path(str(item.fspath))
@@ -65,10 +63,7 @@ def _relative_to_repo(path: Path) -> Path:
 
 def _is_gpu_test(path: Path) -> bool:
     path_parts = path.parts
-    return (
-        any(path_parts[: len(parts)] == parts for parts in GPU_TEST_PATH_PARTS)
-        or path in GPU_TEST_FILES
-    )
+    return any(path_parts[: len(parts)] == parts for parts in GPU_TEST_PATH_PARTS) or path in GPU_TEST_FILES
 
 
 def _is_external_data_test(path: Path) -> bool:

@@ -25,7 +25,9 @@ def run_doctor(checks: list[str] | None = None, root: Path | None = None) -> lis
     if "naming" in selected:
         results.append(_check_naming(root))
     if "inheritance" in selected:
-        results.append(DoctorResult("OK", "inheritance", "inheritance checks are registered for later strict validation"))
+        results.append(
+            DoctorResult("OK", "inheritance", "inheritance checks are registered for later strict validation")
+        )
 
     return sorted(results, key=lambda result: _SEVERITY_ORDER[result.status])
 

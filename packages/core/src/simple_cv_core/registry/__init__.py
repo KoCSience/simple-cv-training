@@ -15,10 +15,10 @@ class RegistryLookupError(KeyError):
     pass
 
 
-class Registry:
+class Registry[T]:
     def __init__(self, label: str):
         self.label = label
-        self._items: dict[str, object] = {}
+        self._items: dict[str, T] = {}
 
     def register(self, name: str, item: T, *, strict: bool = False) -> T:
         normalized_name = normalize_registry_name(name)
@@ -30,7 +30,7 @@ class Registry:
         self._items[normalized_name] = item
         return item
 
-    def get(self, name: str) -> object:
+    def get(self, name: str) -> T:
         normalized_name = normalize_registry_name(name)
         try:
             return self._items[normalized_name]
@@ -47,8 +47,8 @@ class Registry:
 ModelBuilder = TypeVar("ModelBuilder", bound=Callable[..., object])
 DatasetBuilder = TypeVar("DatasetBuilder", bound=Callable[..., object])
 
-MODEL_REGISTRY = Registry("model")
-DATASET_REGISTRY = Registry("dataset")
+MODEL_REGISTRY: Registry[Callable[..., object]] = Registry("model")
+DATASET_REGISTRY: Registry[Callable[..., object]] = Registry("dataset")
 
 
 def normalize_registry_name(name: str) -> str:
@@ -60,21 +60,23 @@ def normalize_registry_name(name: str) -> str:
 
 def register_model(name: str, *, strict: bool = False) -> Callable[[ModelBuilder], ModelBuilder]:
     def decorator(builder: ModelBuilder) -> ModelBuilder:
-        return MODEL_REGISTRY.register(name, builder, strict=strict)
+        MODEL_REGISTRY.register(name, builder, strict=strict)
+        return builder
 
     return decorator
 
 
-def get_model(name: str) -> object:
+def get_model(name: str) -> Callable[..., object]:
     return MODEL_REGISTRY.get(name)
 
 
 def register_dataset(name: str, *, strict: bool = False) -> Callable[[DatasetBuilder], DatasetBuilder]:
     def decorator(builder: DatasetBuilder) -> DatasetBuilder:
-        return DATASET_REGISTRY.register(name, builder, strict=strict)
+        DATASET_REGISTRY.register(name, builder, strict=strict)
+        return builder
 
     return decorator
 
 
-def get_dataset(name: str) -> object:
+def get_dataset(name: str) -> Callable[..., object]:
     return DATASET_REGISTRY.get(name)
