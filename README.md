@@ -21,8 +21,8 @@ uvを使うことを推奨しています。
 ### 実行例
 
 ```shell
-uv run python3 main.py -w 24 -b 8 -e 5 -d ImageFolder -r /mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/  --use_dp --disable_comet  # no comet
-uv run python3 main_pl.py -w 24 -b 8 -e 5 -d ImageFolder -r /mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ --devices 3 --disable_comet # no comet
+uv run python3 main.py data=image_folder dataset.root=/mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ trainer=smoke disable_comet=true
+uv run python3 main_pl.py data=image_folder dataset.root=/mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ trainer=smoke GPU.devices=1 disable_comet=true
 ```
 
 ### 旧
@@ -38,13 +38,18 @@ pip install -r requirements.txt
 ## 使い方
 
 ```bash
-python3 main.py -w 24 -b 8 -e 5 -d ImageFolder -r /mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/  --use_dp
-python3 main.py -w 24 -b 8 -e 5 -d ImageFolder -r /mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/  --use_dp --disable_comet  # no comet
-python3 main_pl.py -w 24 -b 8 -e 5 -d ImageFolder -r /mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ --devices 3
-python3 main_pl.py -w 24 -b 8 -e 5 -d ImageFolder -r /mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ --devices 3 --disable_comet # no comet
+uv run python3 main.py data=image_folder dataset.root=/mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ training.num_workers=24 training.batch_size=8 training.num_epochs=5 GPU.use_dp=true
+uv run python3 main.py data=image_folder dataset.root=/mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ training.num_workers=24 training.batch_size=8 training.num_epochs=5 GPU.use_dp=true disable_comet=true
+uv run python3 main_pl.py data=image_folder dataset.root=/mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ training.num_workers=24 training.batch_size=8 training.num_epochs=5 GPU.devices=3
+uv run python3 main_pl.py data=image_folder dataset.root=/mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ training.num_workers=24 training.batch_size=8 training.num_epochs=5 GPU.devices=3 disable_comet=true
 ```
 
-`_pl`がついたファイルは Pytorch lightning のコードを使用（ddp のみ対応）．
+`main.py` は Hydra + 手動 PyTorch loop の教材用入口です。`main_pl.py` は Hydra + PyTorch Lightning の入口です。
+
+checkpoint 形式は入口ごとに異なります。
+
+- `main.py`: `utils.save_to_checkpoint()` が保存する `.pt` 形式
+- `main_pl.py`: Lightning `Trainer` が保存する `.ckpt` 形式
 
 ### multi-GPU 学習
 
@@ -55,8 +60,8 @@ GPU の指定には`CUDA_VISIBLE_DEVICES`を使用すること．
   - 注意：複数 GPU を用いる dp や ddp が動作しなくなるため，コード内で GPU 番号を指定するような`torch.device("cuda:0")`は**使わない**．dp や ddp のために，コード内では`torch.device("cuda")`としておく．
 
 ```bash
-CUDA_VISIBLE_DEVICES=0,1 python3 main.py -w 24 -b 8 -e 5 -d ImageFolder -r /mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/  --use_dp
-CUDA_VISIBLE_DEVICES=0,1 python3 main_pl.py -w 24 -b 8 -e 5 -d ImageFolder -r /mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ --devices 3
+CUDA_VISIBLE_DEVICES=0,1 uv run python3 main.py data=image_folder dataset.root=/mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ training.num_workers=24 training.batch_size=8 training.num_epochs=5 GPU.use_dp=true
+CUDA_VISIBLE_DEVICES=0,1 uv run python3 main_pl.py data=image_folder dataset.root=/mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ training.num_workers=24 training.batch_size=8 training.num_epochs=5 GPU.devices=2
 ```
 
 デバッグ用には [launch.json](.vscode/launch.json) を以下のように設定する．
@@ -77,88 +82,29 @@ task 用には[tasks.json](.vscode/tasks.json)に次のように設定する．
             },
 ```
 
-### option
+### config override
 
-詳しくは`args.py`を参照．主なオプションは以下の通り．
+詳しくは `configs/` と [docs/how-to/configure_experiment.md](docs/how-to/configure_experiment.md) を参照．主な override は以下の通り．
 
-- `-r`：データセットの root フォルダ
-- `-b`：バッチサイズ
-- `-w`：データローダーのワーカー数
-- `-e`：エポック数
-- `-d`：データセット
+- `dataset.root`：データセットの root フォルダ
+- `training.batch_size`：バッチサイズ
+- `training.num_workers`：データローダーのワーカー数
+- `training.num_epochs`：エポック数
+- `data` または `dataset.dataset_name`：データセット
   - `CIFAR10`：[torchvision の CIFAR10](https://pytorch.org/vision/main/generated/torchvision.datasets.CIFAR10.html)
-  - `ImageFolder`：`-r`で指定したフォルダ以下に`train/`と`val/`のディレクトリがあり，それ以下はカテゴリ名のサブディレクトリに分かれて保存されている画像データセット（[torchvision の ImageFolder](https://pytorch.org/vision/main/generated/torchvision.datasets.ImageFolder.html)）
-- `--use_dp`：dp (Data Parallel)で複数 GPU を使用する（lightning ではない場合）
-- `--devices`: lightning の ddp で使用する GPU 番号（-1 は全 GPU を使用）
-- `--disable_comet`: cometを無効化して実行する
+  - `ImageFolder`：`dataset.root`で指定したフォルダ以下に`train/`と`val/`のディレクトリがあり，それ以下はカテゴリ名のサブディレクトリに分かれて保存されている画像データセット（[torchvision の ImageFolder](https://pytorch.org/vision/main/generated/torchvision.datasets.ImageFolder.html)）
+- `GPU.use_dp=true`：`main.py` の手動 loop で dp (Data Parallel)を使用する
+- `GPU.devices`: `main_pl.py` の Lightning で使用する GPU 数または GPU 番号（`-1` は全 GPU）
+- `disable_comet=true`: cometを無効化して実行する
 
 #### help
 
 ```bash
-python3 main.py -h
-python3 main_pl.py -h
+uv run python3 main.py --help
+uv run python3 main_pl.py --help
 ```
 
-を実行すると以下が表示される．
-
-```text
-usage: main.py [-h] [-r str] [-d {CIFAR10,ImageFolder,VideoFolder,ZeroImages}] [-td str] [-vd str] [--torch_home str]
-               [-m {resnet18,resnet50,x3d,abn_r50,vit_b,zero_output_dummy}] [--use_pretrained] [--scratch] [--frames_per_clip int]
-               [--clip_duration float] [--clips_per_video int] [-b int] [-w int] [-e int] [-vi int] [-li int] [--optimizer_name {SGD,Adam}]
-               [--grad_accum int] [-lr float] [--momentum float] [--weight_decay float] [--use_scheduler] [--no_scheduler] [--use_dp]
-               [--devices str] [--comet_log_dir str] [--tf_log_dir str] [--save_checkpoint_dir str] [--checkpoint_to_resume str] [--disable_comet]
-
-simple image/video classification
-
-options:
-  -h, --help            show this help message and exit
-  -r str, --root str    root of dataset. (default: ./downloaded_data)
-  -d {CIFAR10,ImageFolder,VideoFolder,ZeroImages}, --dataset_name {CIFAR10,ImageFolder,VideoFolder,ZeroImages}
-                        name of dataset. (default: CIFAR10)
-  -td str, --train_dir str
-                        subdier name of training dataset. (default: train)
-  -vd str, --val_dir str
-                        subdier name of validation dataset. (default: val)
-  --torch_home str      TORCH_HOME environment variable where pre-trained model weights are stored. (default: ./pretrained_models)
-  -m {resnet18,resnet50,x3d,abn_r50,vit_b,zero_output_dummy}, --model_name {resnet18,resnet50,x3d,abn_r50,vit_b,zero_output_dummy}
-                        name of the model (default: resnet18)
-  --use_pretrained      use pretrained model weights (default) (default: True)
-  --scratch             do not use pretrained model weights, instead train from scratch (not default) (default: True)
-  --frames_per_clip int
-                        frames per clip. (default: 16)
-  --clip_duration float
-                        duration of a clip (in second). (default: 2.6666666666666665)
-  --clips_per_video int
-                        sampling clips per video for validation (default: 1)
-  -b int, --batch_size int
-                        batch size. (default: 8)
-  -w int, --num_workers int
-                        number of workers. (default: 2)
-  -e int, --num_epochs int
-                        number of epochs. (default: 25)
-  -vi int, --val_interval_epochs int
-                        validation interval in epochs. (default: 1)
-  -li int, --log_interval_steps int
-                        logging interval in steps. (default: 1)
-  --optimizer_name {SGD,Adam}
-                        optimizer name. (default: SGD)
-  --grad_accum int      steps to accumlate gradients. (default: 1)
-  -lr float             learning rate. (default: 0.0001)
-  --momentum float      momentum of SGD. (default: 0.9)
-  --weight_decay float  weight decay. (default: 0.0005)
-  --use_scheduler       use scheduler (not default) (default: False)
-  --no_scheduler        do not use scheduler (default) (default: False)
-  --use_dp              GPUs with data parallel (dp); not for lightning (default: False)
-  --devices str         GPUs used for ddp strategy (only for lightning). '-1' for all gpus. (default: 1)
-  --comet_log_dir str   dir to comet log files. (default: ./comet_logs/)
-  --tf_log_dir str      dir to TensorBoard log files. (default: ./tf_logs/)
-  --save_checkpoint_dir str
-                        dir to save checkpoint files. (default: ./log)
-  --checkpoint_to_resume str
-                        path to the checkpoint file to resume from. (default: None)
-  --disable_comet, --no_comet
-                        do not use comet.ml (default: use comet) (default: False)
-```
+Hydra で合成された設定は `uv run python3 main.py --cfg job` または `uv run python3 main_pl.py --cfg job` で確認できます。
 
 ## Comet の設定
 
@@ -229,7 +175,7 @@ cli_arguments=True
 - `pyproject.toml`: プロジェクトのメタデータ、パッケージ依存関係を記述 \
   [PEP 621 – Storing project metadata in pyproject.toml | peps.python.org](https://peps.python.org/pep-0621/)
 - `uv.lock`: パッケージのバージョンの指定
-- `config/config.yaml`: パラメーターツールHydraを使っています。引数設定はここを触る。
+- `configs/train.yaml`: パラメーターツールHydraを使っています。引数設定はここを触る。
 
 ## テスト環境
 

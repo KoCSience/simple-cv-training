@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import torch
 import lightning.pytorch as pl
+import torch
 from lightning.pytorch.plugins import TorchSyncBatchNorm
 from omegaconf import DictConfig
 
@@ -14,6 +14,7 @@ from model import SimpleLightningModel
 
 def run_lightning_training(cfg: DictConfig) -> None:
     typed_cfg = validate_experiment_config(cfg)
+    _require_lightning_checkpoint_format(typed_cfg.checkpoint_file.checkpoint_to_resume)
     _require_cuda_for_training()
 
     loggers, exp_name = configure_logger_pl(
@@ -61,3 +62,10 @@ def _require_cuda_for_training() -> None:
             "CUDA is required for the current Lightning training entrypoint. "
             "Check nvidia-smi and torch.cuda.is_available(), or run CPU-only tests with uv run pytest."
         )
+
+
+def _require_lightning_checkpoint_format(checkpoint_to_resume: str | None) -> None:
+    if checkpoint_to_resume is None or checkpoint_to_resume.startswith("experiment:"):
+        return
+    if checkpoint_to_resume.endswith(".pt"):
+        raise ValueError("main_pl.py uses Lightning .ckpt checkpoints. Use main.py to resume a manual .pt checkpoint.")

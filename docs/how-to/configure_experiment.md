@@ -2,9 +2,10 @@
 
 実験設定はコード中の分岐ではなく、`configs/` 以下のYAMLとHydra overrideで変更します。
 
-主な入口は `configs/train.yaml` です。
+主な入口は `configs/train.yaml` です。`main.py` と `main_pl.py` は同じ設定を使います。
 
 ```bash
+uv run python main.py --cfg job
 uv run python main_pl.py --cfg job
 ```
 

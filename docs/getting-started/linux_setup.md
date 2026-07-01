@@ -42,7 +42,8 @@ uv run pytest --run-gpu
 現在の互換入口では、Cometを無効にして次のように実行できます。
 
 ```bash
-uv run python main_pl.py data=zero_images trainer=smoke
+uv run python main.py data=zero_images trainer=smoke disable_comet=true
+uv run python main_pl.py data=zero_images trainer=smoke disable_comet=true
 ```
 
-リファクタリング後は `scv train` を正式入口にします。移行中は互換のため `main.py` と `main_pl.py` を残します。
+リファクタリング後は `scv train` を正式入口にします。移行中は教材として `main.py` の手動 PyTorch loop と `main_pl.py` の Lightning loop を残します。
