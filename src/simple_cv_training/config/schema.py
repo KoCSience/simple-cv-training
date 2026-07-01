@@ -43,6 +43,35 @@ class OptimizerConfig(BaseModel):
     use_scheduler: bool = False
 
 
+class AmpConfig(BaseModel):
+    enabled: bool = False
+    precision: Literal["32-true", "16-mixed", "bf16-mixed"] = "bf16-mixed"
+    require_bf16_supported: bool = True
+
+
+class TorchCompileConfig(BaseModel):
+    enabled: bool = False
+    mode: Literal["default", "reduce-overhead", "max-autotune", "max-autotune-no-cudagraphs"] = "default"
+    fullgraph: bool = False
+    backend: str | None = None
+    dynamic: bool | None = None
+
+
+class BenchmarkConfig(BaseModel):
+    enabled: bool = True
+
+
+class EnvironmentLogConfig(BaseModel):
+    log: bool = True
+
+
+class OptimizationConfig(BaseModel):
+    amp: AmpConfig = Field(default_factory=AmpConfig)
+    compile: TorchCompileConfig = Field(default_factory=TorchCompileConfig)
+    benchmark: BenchmarkConfig = Field(default_factory=BenchmarkConfig)
+    environment: EnvironmentLogConfig = Field(default_factory=EnvironmentLogConfig)
+
+
 class GpuConfig(BaseModel):
     use_dp: bool = False
     devices: str | int = "1"
@@ -102,6 +131,7 @@ class ExperimentConfig(BaseModel):
     video: VideoConfig = Field(default_factory=VideoConfig)
     training: TrainingConfig
     optimizer: OptimizerConfig
+    optimization: OptimizationConfig = Field(default_factory=OptimizationConfig)
     GPU: GpuConfig = Field(default_factory=GpuConfig)
     log_dirs: LogDirsConfig = Field(default_factory=LogDirsConfig)
     checkpoint_file: CheckpointConfig = Field(default_factory=CheckpointConfig)
