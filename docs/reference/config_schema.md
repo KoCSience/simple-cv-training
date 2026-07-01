@@ -51,9 +51,11 @@ optimization:
     log: true
 ```
 
-`optimization.amp.enabled=true` のときだけ Lightning Trainer に precision を渡します。`bf16-mixed` は Turing 世代 GPU では対応していません。Ampere 世代以降の対応 GPU を想定しますが、実行時の判定は PyTorch の `torch.cuda.is_bf16_supported()` を優先します。
+`optimization.amp.*` は Lightning runner 向けの設定です。`optimization.amp.enabled=true` のときだけ `main_pl.py` の Lightning Trainer に precision を渡します。`bf16-mixed` は Turing 世代 GPU では対応していません。Ampere 世代以降の対応 GPU を想定しますが、実行時の判定は PyTorch の `torch.cuda.is_bf16_supported()` を優先します。
 
-`optimization.compile.enabled=true` のときだけ、LightningModule を `trainer.fit()` に渡す前に `torch.compile` で包みます。
+`optimization.compile.*` は manual runner と Lightning runner の両方で使えます。`main.py` では checkpoint load 後、DataParallel 前に model adapter として `torch.compile` を適用します。`main_pl.py` では LightningModule を `trainer.fit()` に渡す前に `torch.compile` で包みます。
+
+`main.py` は手動 PyTorch loop の教材用入口なので、manual runner では AMP をサポートしません。AMP を入れると `train.py` に `autocast`、loss/backward、必要に応じて `GradScaler` の責務が入り、初学者向け loop の見通しが悪くなるためです。
 
 beginner mode では baseline を優先し、researcher mode や `configs/experiment/` では必要な最適化だけを明示的に有効化してください。
 
