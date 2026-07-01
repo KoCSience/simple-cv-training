@@ -1,7 +1,7 @@
 import pytest
 from torch.optim.lr_scheduler import LRScheduler
 
-from setup import configure_optimizer, configure_scheduler
+from simple_cv_training.setup import configure_optimizer, configure_scheduler
 
 
 @pytest.fixture(scope='session')

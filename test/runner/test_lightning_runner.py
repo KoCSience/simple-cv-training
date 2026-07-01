@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from runner import lightning_runner
+from simple_cv_training.runner import lightning_runner
 
 
 def test_lightning_runner_rejects_manual_checkpoint_suffix() -> None:

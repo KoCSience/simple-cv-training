@@ -1,20 +1,18 @@
 from dataclasses import dataclass
+
 import pytest
-
-
 import torch
 from torch import nn
 
-
-from model import (
-    configure_model,
+from simple_cv_training.model import (
     ModelConfig,
+    configure_model,
 )
-from utils import (
-    save_to_checkpoint,
+from simple_cv_training.setup import configure_optimizer, configure_scheduler
+from simple_cv_training.utils import (
     load_from_checkpoint,
+    save_to_checkpoint,
 )
-from setup import configure_optimizer, configure_scheduler
 
 
 @dataclass

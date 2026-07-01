@@ -1,12 +1,11 @@
 import pytest
-
 import torch
 from torch import nn
 
-from model import (
-    configure_model,
-    ModelConfig,
+from simple_cv_training.model import (
     ClassificationBaseModel,
+    ModelConfig,
+    configure_model,
     get_device,
 )
 

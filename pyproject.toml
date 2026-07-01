@@ -1,5 +1,5 @@
 [project]
-name = "simple_cnn_training"
+name = "simple-cv-training"
 version = "0.0.1"
 description = ""
 readme = "README.md"
@@ -36,6 +36,14 @@ dependencies = [
     "webdataset>=1.0.2",
     "wheel>=0.46.3",
 ]
+
+[build-system]
+requires = ["setuptools>=81.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["simple_cv_training*"]
 
 # [tool.autopep8]
 # # https://github.com/hhatto/autopep8#configuration

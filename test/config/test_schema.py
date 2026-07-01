@@ -6,8 +6,7 @@ import pytest
 from hydra import compose, initialize_config_dir
 from pydantic import ValidationError
 
-from config import validate_experiment_config
-
+from simple_cv_training.config import validate_experiment_config
 
 CONFIG_DIR = str(Path("configs").resolve())
 

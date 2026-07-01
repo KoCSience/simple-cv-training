@@ -1,8 +1,7 @@
 import pytest
-
 from torch import Tensor
 
-from utils import compute_topk_accuracy
+from simple_cv_training.utils import compute_topk_accuracy
 
 
 @pytest.mark.parametrize(

@@ -1,7 +1,7 @@
 import pytest
 import torch
 
-from model import configure_model, ModelConfig
+from simple_cv_training.model import ModelConfig, configure_model
 
 
 @pytest.fixture(scope='session')

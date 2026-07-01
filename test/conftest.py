@@ -4,7 +4,6 @@ from pathlib import Path
 
 import pytest
 
-
 GPU_TEST_PATH_PARTS = {
     ("test", "model"),
     ("test", "setup"),

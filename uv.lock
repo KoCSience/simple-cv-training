@@ -3817,9 +3817,9 @@ wheels = [
 ]
 
 [[package]]
-name = "simple-cnn-training"
+name = "simple-cv-training"
 version = "0.0.1"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "albumentations" },
     { name = "av" },

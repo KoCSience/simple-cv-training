@@ -1,6 +1,6 @@
 # Config schema
 
-設定はHydraで合成し、`config/schema.py` のPydantic schemaで型と値を検証します。
+設定はHydraで合成し、`src/simple_cv_training/config/schema.py` のPydantic schemaで型と値を検証します。
 
 ## 主なグループ
 

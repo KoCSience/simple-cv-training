@@ -1,8 +1,7 @@
 import pytest
-
 from torch import Tensor
 
-from utils import (
+from simple_cv_training.utils import (
     AverageMeter,
     AvgMeterLossTopk,
 )

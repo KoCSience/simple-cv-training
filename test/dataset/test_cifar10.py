@@ -1,7 +1,7 @@
 # import pytest
 # import torch
 
-# from dataset import (
+# from simple_cv_training.dataset import (
 #     cifar10,
 #     Cifar10Info,
 #     transform_image,

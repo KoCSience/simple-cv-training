@@ -1,8 +1,8 @@
 import hydra
 from omegaconf import DictConfig
 
-from config.hydra_compat import patch_hydra_argparse_for_python314
-from runner import run_manual_training
+from simple_cv_training.config.hydra_compat import patch_hydra_argparse_for_python314
+from simple_cv_training.runner import run_manual_training
 
 CONFIG_PATH = "configs"
 CONFIG_NAME = "train"

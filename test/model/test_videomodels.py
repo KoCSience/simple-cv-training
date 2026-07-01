@@ -1,12 +1,11 @@
 import pytest
-
 import torch
 
-from model import (
-    configure_model,
+from simple_cv_training.model import (
+    ClassificationBaseModel,
     ModelConfig,
     ModelOutput,
-    ClassificationBaseModel,
+    configure_model,
 )
 
 

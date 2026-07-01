@@ -1,11 +1,11 @@
 import pytest
 import torch
 
-from dataset import (
-    zero_images,
+from simple_cv_training.dataset import (
+    TransformImageInfo,
     ZeroImageInfo,
     transform_image,
-    TransformImageInfo,
+    zero_images,
 )
 
 

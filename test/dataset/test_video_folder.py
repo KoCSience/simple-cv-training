@@ -1,11 +1,11 @@
 import pytest
 import torch
 
-from dataset import (
-    video_folder,
+from simple_cv_training.dataset import (
+    TransformVideoInfo,
     VideoFolderInfo,
     transform_video,
-    TransformVideoInfo,
+    video_folder,
 )
 
 

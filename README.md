@@ -113,7 +113,7 @@ comet の設定は，
 - このディレクトリの`./.comet.config`と，
 - ホームの`~/.comet.config`
 
-の 2 つのファイルを利用する．詳しくは[comet のドキュメント](https://www.comet.com/docs/v2/api-and-sdk/python-sdk/advanced/configuration/)を参照．コード中には API キーなどは書かないこと（[logger.py](./logger/logger.py)参照）．
+の 2 つのファイルを利用する．詳しくは[comet のドキュメント](https://www.comet.com/docs/v2/api-and-sdk/python-sdk/advanced/configuration/)を参照．コード中には API キーなどは書かないこと（[logger.py](./src/simple_cv_training/logger/logger.py)参照）．
 
 ### ホームでの全体設定
 

@@ -1,7 +1,7 @@
 import pytest
 from torch.optim import Optimizer
 
-from setup import configure_optimizer
+from simple_cv_training.setup import configure_optimizer
 
 
 @pytest.mark.parametrize('optimizer_name', ["SGD", "Adam"])

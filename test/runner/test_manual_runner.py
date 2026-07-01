@@ -7,7 +7,7 @@ import pytest
 import torch
 from hydra import compose, initialize_config_dir
 
-from runner import manual_runner
+from simple_cv_training.runner import manual_runner
 
 CONFIG_DIR = str(Path("configs").resolve())
 

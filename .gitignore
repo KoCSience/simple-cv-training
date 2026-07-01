@@ -13,3 +13,5 @@ hub/
 
 refactor-doc/
 _GARBAGE/
+*.egg-info/
+*.egg
