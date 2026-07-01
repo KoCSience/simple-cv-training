@@ -33,3 +33,14 @@ uv run python main_pl.py checkpoint_file.checkpoint_to_resume=/path/to/checkpoin
 ```
 
 `main.py` は独自の `.pt` checkpoint、`main_pl.py` は Lightning の `.ckpt` checkpoint を使います。checkpointのパスは存在するファイルを指定してください。存在しない場合は実行前にエラーにします。
+
+## 最適化を試す
+
+既定では baseline の再現性を優先し、AMP と `torch.compile` は有効化しません。Lightning 経路で高速化を比較したい場合は、明示的に有効化します。
+
+```bash
+uv run python main_pl.py data=zero_images trainer=smoke disable_comet=true optimization.amp.enabled=true
+uv run python main_pl.py data=zero_images trainer=smoke disable_comet=true optimization.compile.enabled=true
+```
+
+詳しくは [Use optimization options](use_optimization.md) を参照してください。

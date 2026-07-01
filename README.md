@@ -25,6 +25,13 @@ uv run python3 main.py data=image_folder dataset.root=/mnt/NAS-TVS872XT/dataset-
 uv run python3 main_pl.py data=image_folder dataset.root=/mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ trainer=smoke GPU.devices=1 disable_comet=true
 ```
 
+高速化は初期状態では有効化しません。Lightning 経路で比較したい場合だけ、明示的に指定します。
+
+```shell
+uv run python3 main_pl.py data=image_folder dataset.root=/mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ trainer=smoke GPU.devices=1 disable_comet=true optimization.amp.enabled=true
+uv run python3 main_pl.py data=image_folder dataset.root=/mnt/NAS-TVS872XT/dataset-lab/Tiny-ImageNet/ trainer=smoke GPU.devices=1 disable_comet=true optimization.compile.enabled=true
+```
+
 ### 旧
 
 ```bash
@@ -95,6 +102,8 @@ task 用には[tasks.json](.vscode/tasks.json)に次のように設定する．
   - `ImageFolder`：`dataset.root`で指定したフォルダ以下に`train/`と`val/`のディレクトリがあり，それ以下はカテゴリ名のサブディレクトリに分かれて保存されている画像データセット（[torchvision の ImageFolder](https://pytorch.org/vision/main/generated/torchvision.datasets.ImageFolder.html)）
 - `GPU.use_dp=true`：`main.py` の手動 loop で dp (Data Parallel)を使用する
 - `GPU.devices`: `main_pl.py` の Lightning で使用する GPU 数または GPU 番号（`-1` は全 GPU）
+- `optimization.amp.enabled=true`: `main_pl.py` の Lightning で AMP を有効化する。既定の precision は `bf16-mixed`
+- `optimization.compile.enabled=true`: `main_pl.py` の LightningModule に `torch.compile` を適用する
 - `disable_comet=true`: cometを無効化して実行する
 
 #### help

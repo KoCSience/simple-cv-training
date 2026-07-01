@@ -22,6 +22,7 @@ defaults:
   - model: resnet18
   - optimizer: sgd
   - trainer: default
+  - optimization: default
   - mode: beginner
 ```
 

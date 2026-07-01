@@ -9,6 +9,7 @@
 3. [Run training](how-to/run_training.md)
 4. [Configure experiments](how-to/configure_experiment.md)
 5. [Use Hydra](how-to/use_hydra.md)
+6. [Use optimization options](how-to/use_optimization.md)
 
 モデルやデータセットを追加する場合:
 
