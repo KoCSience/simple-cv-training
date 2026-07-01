@@ -2,6 +2,7 @@ __pycache__/
 log/
 comet_logs/
 tf_logs/
+outputs/
 downloaded_data/
 pretrained_models/
 .hypothesis/
@@ -12,3 +13,5 @@ hub/
 
 refactor-doc/
 _GARBAGE/
+*.egg-info/
+*.egg
