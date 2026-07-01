@@ -1,16 +1,12 @@
 from __future__ import annotations
 
-from typing import TypeVar
-
 import torch
 from torch import nn
 
 from simple_cv_training.config.schema import TorchCompileConfig
 
-ModelT = TypeVar("ModelT", bound=nn.Module)
 
-
-def apply_torch_compile(model: ModelT, config: TorchCompileConfig) -> ModelT:
+def apply_torch_compile[ModelT: nn.Module](model: ModelT, config: TorchCompileConfig) -> ModelT:
     """Apply torch.compile only when an experiment explicitly opts in."""
     if not config.enabled:
         return model
