@@ -1,6 +1,5 @@
 import os
 from collections import OrderedDict
-from typing import Tuple
 
 import comet_ml
 import torch
@@ -13,8 +12,8 @@ from simple_cv_training.model.base_model import ClassificationBaseModel
 
 
 def remove_layer_prefix_from_state_dict(
-        model_state_dict: dict,
-        prefix_to_remove: str = 'module.',
+    model_state_dict: dict,
+    prefix_to_remove: str = "module.",
 ) -> OrderedDict:
     """convert nn.DataParallel state_dict to nn.Module state_dict
 
@@ -28,14 +27,14 @@ def remove_layer_prefix_from_state_dict(
     new_model_state_dict = OrderedDict()
     for key_name, value in model_state_dict.items():
         if key_name.startswith(prefix_to_remove):
-            new_key_name = key_name.replace(prefix_to_remove, '')
+            new_key_name = key_name.replace(prefix_to_remove, "")
             new_model_state_dict[new_key_name] = value
     return new_model_state_dict
 
 
 def add_layer_prefix_to_state_dict(
-        model_state_dict: dict,
-        prefix_to_add: str = 'module.',
+    model_state_dict: dict,
+    prefix_to_add: str = "module.",
 ) -> OrderedDict:
     """convert nn.Module state_dict to nn.DataParallel state_dict
 
@@ -53,6 +52,25 @@ def add_layer_prefix_to_state_dict(
     return new_model_state_dict
 
 
+def normalize_wrapped_model_state_dict(
+    model_state_dict: dict,
+    prefixes_to_remove: tuple[str, ...] = ("module.", "_orig_mod."),
+) -> OrderedDict:
+    """Remove wrapper prefixes so manual .pt checkpoints remain loadable by the base model."""
+    normalized_model_state_dict = OrderedDict()
+    for key_name, value in model_state_dict.items():
+        normalized_key_name = key_name
+        removed_prefix = True
+        while removed_prefix:
+            removed_prefix = False
+            for prefix_to_remove in prefixes_to_remove:
+                if normalized_key_name.startswith(prefix_to_remove):
+                    normalized_key_name = normalized_key_name.removeprefix(prefix_to_remove)
+                    removed_prefix = True
+        normalized_model_state_dict[normalized_key_name] = value
+    return normalized_model_state_dict
+
+
 def save_to_checkpoint(
     save_checkpoint_dir: str,
     current_epoch: int,
@@ -63,7 +81,7 @@ def save_to_checkpoint(
     optimizer: Optimizer,
     scheduler: LRScheduler,
     experiment_logger: comet_ml.Experiment,
-) -> Tuple[dict, str]:
+) -> tuple[dict, str]:
     """save checkpoint to file
 
     Args:
@@ -90,9 +108,7 @@ def save_to_checkpoint(
         f"epoch{current_epoch}_step{current_train_step}_acc={acc:.2f}.pt",
     )
 
-    model_state_dict = model.state_dict()
-    if isinstance(model, nn.DataParallel):
-        model_state_dict = remove_layer_prefix_from_state_dict(model_state_dict)
+    model_state_dict = normalize_wrapped_model_state_dict(model.state_dict())
 
     checkpoint_dict = {
         "current_epoch": current_epoch,
@@ -128,8 +144,8 @@ def load_from_checkpoint(
     model: nn.Module | nn.DataParallel | ClassificationBaseModel,
     optimizer: Optimizer,
     scheduler: LRScheduler,
-    device: torch.device
-) -> Tuple[int, int, int, nn.Module | nn.DataParallel | ClassificationBaseModel, Optimizer, LRScheduler]:
+    device: torch.device,
+) -> tuple[int, int, int, nn.Module | nn.DataParallel | ClassificationBaseModel, Optimizer, LRScheduler]:
     """load from checkpoint file or online comet_ml
 
     Args:
