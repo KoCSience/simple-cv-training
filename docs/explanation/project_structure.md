@@ -18,7 +18,6 @@
 - `src/simple_cv_training/train.py`: 手動 PyTorch loop の1 epoch training処理
 - `src/simple_cv_training/val.py`: 手動 PyTorch loop のvalidation処理
 - `src/simple_cv_training/utils/`: 手動 loop 用 checkpoint、accuracy、meter
-- `_GARBAGE/args_legacy_argparse/`: Hydra移行前のargparse実装の退避先
 
 `main.py` / `main_pl.py` は、repo root から `python3 main.py ...` / `python3 main_pl.py ...` と起動する互換入口として残します。一方で、runner、dataset、model、logger、configなどのimportされる実装本体は `src/simple_cv_training/` に集約します。
 

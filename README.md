@@ -179,8 +179,8 @@ cli_arguments=True
 
 ## テスト環境
 
-PyTestが入っています。
+PyTestを利用してください。
 
 ```shell
-uv run python3 -m pytest test/dataset
+uv run pytest test/dataset
 ```

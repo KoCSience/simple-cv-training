@@ -19,3 +19,5 @@
 
 - [Project structure](explanation/project_structure.md)
 - [Config schema](reference/config_schema.md)
+
+このフェーズでは、実行方法は [Run training](how-to/run_training.md)、設定方法は [Configure experiments](how-to/configure_experiment.md) と [Use Hydra](how-to/use_hydra.md)、構造の意図は [Project structure](explanation/project_structure.md) に分けて記載しています。

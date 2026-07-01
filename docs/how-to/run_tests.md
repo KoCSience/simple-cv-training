@@ -10,6 +10,12 @@ uv run pytest
 
 通常のCIではこの範囲を実行します。
 
+`pytest` のentrypoint解決で問題がある場合は、同じ環境で次のようにmoduleとして実行できます。
+
+```bash
+uv run python -m pytest
+```
+
 ## GPUテスト
 
 ```bash
