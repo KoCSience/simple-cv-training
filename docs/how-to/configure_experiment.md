@@ -53,9 +53,17 @@ uv run python main_pl.py optimizer=adam optimizer.lr=1e-4
 uv run python main_pl.py training.num_epochs=50
 ```
 
+最適化:
+
+```bash
+uv run python main_pl.py optimization.amp.enabled=true
+uv run python main_pl.py optimization.compile.enabled=true
+```
+
 ## 設定変更の考え方
 
 - 何度も使う実験は `configs/experiment/` に保存する。
 - その場だけの変更はコマンドラインoverrideで指定する。
 - 型や範囲の検証は Pydantic schema 側で行う。
 - `checkpoint_file.checkpoint_to_resume` に通常ファイルを指定した場合、存在しないパスは実行前にエラーになる。
+- 最適化は baseline と比較できるよう、必要な実験で明示的に有効化する。

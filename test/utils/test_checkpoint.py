@@ -21,12 +21,9 @@ class DummyLogger:
     name: str = "experiment_name"
 
 
-@pytest.mark.parametrize(
-    'model_name',
-    ["resnet18", "resnet50", "abn_r50", "vit_b", "x3d", "zero_output_dummy"]
-)
-@pytest.mark.parametrize('use_dp_when_save', [True, False])
-@pytest.mark.parametrize('use_dp_when_load', [True, False])
+@pytest.mark.parametrize("model_name", ["resnet18", "resnet50", "abn_r50", "vit_b", "x3d", "zero_output_dummy"])
+@pytest.mark.parametrize("use_dp_when_save", [True, False])
+@pytest.mark.parametrize("use_dp_when_load", [True, False])
 def test_checkpoint_save_load(  # noqa: FNE003 FNE004
     model_name,
     use_dp_when_save,
@@ -48,11 +45,13 @@ def test_checkpoint_save_load(  # noqa: FNE003 FNE004
     device = torch.device("cuda")
 
     # prepare model, optimzer, scheduler to save
-    model = configure_model(ModelConfig(
-        model_name=model_name,
-        n_classes=n_classes,
-        use_pretrained=use_pretrained,
-    ))
+    model = configure_model(
+        ModelConfig(
+            model_name=model_name,
+            n_classes=n_classes,
+            use_pretrained=use_pretrained,
+        )
+    )
     model.to(device)
     if use_dp_when_save:
         model = nn.DataParallel(model)  # type: ignore[assignment]
@@ -62,12 +61,9 @@ def test_checkpoint_save_load(  # noqa: FNE003 FNE004
         lr=lr,
         weight_decay=weight_decay,
         momentum=momentum,
-        model_params=model.parameters()
+        model_params=model.parameters(),
     )
-    scheduler = configure_scheduler(
-        optimizer=optimizer,
-        use_scheduler=use_scheduler
-    )
+    scheduler = configure_scheduler(optimizer=optimizer, use_scheduler=use_scheduler)
 
     # save
     _, checkpoint_filename = save_to_checkpoint(
@@ -83,11 +79,13 @@ def test_checkpoint_save_load(  # noqa: FNE003 FNE004
     )
 
     # prepare another model, optimzer, scheduler to load
-    another_model = configure_model(ModelConfig(
-        model_name=model_name,
-        n_classes=n_classes,
-        use_pretrained=use_pretrained,
-    ))
+    another_model = configure_model(
+        ModelConfig(
+            model_name=model_name,
+            n_classes=n_classes,
+            use_pretrained=use_pretrained,
+        )
+    )
     another_model.to(device)
     if use_dp_when_load:
         another_model = nn.DataParallel(another_model)  # type: ignore[assignment]
@@ -97,12 +95,9 @@ def test_checkpoint_save_load(  # noqa: FNE003 FNE004
         lr=lr,
         weight_decay=weight_decay,
         momentum=momentum,
-        model_params=another_model.parameters()
+        model_params=another_model.parameters(),
     )
-    another_scheduler = configure_scheduler(
-        optimizer=another_optimizer,
-        use_scheduler=use_scheduler
-    )
+    another_scheduler = configure_scheduler(optimizer=another_optimizer, use_scheduler=use_scheduler)
 
     # load
     (
@@ -117,7 +112,7 @@ def test_checkpoint_save_load(  # noqa: FNE003 FNE004
         model=another_model,
         optimizer=another_optimizer,
         scheduler=another_scheduler,
-        device=device
+        device=device,
     )
 
     # check
@@ -134,8 +129,7 @@ def test_checkpoint_save_load(  # noqa: FNE003 FNE004
     assert id(loaded_model) != id(model)
 
     # below is "assert loaded_model == model"
-    for p1, p2 in zip(loaded_model.named_parameters(), model.named_parameters()):
-
+    for p1, p2 in zip(loaded_model.named_parameters(), model.named_parameters(), strict=False):
         # instead of assert p1[0] == p2[0], below compares "conv1" == "module.conv1"
         assert p1[0] in p2[0] or p2[0] in p1[0], "layer names are different"
 

@@ -12,6 +12,7 @@ from simple_cv_training.dataset import configure_dataloader
 from simple_cv_training.logger import configure_logger
 from simple_cv_training.model import ModelConfig as ClassificationModelConfig
 from simple_cv_training.model import configure_model
+from simple_cv_training.optimization import apply_torch_compile
 from simple_cv_training.setup import configure_optimizer, configure_scheduler
 from simple_cv_training.train import TrainConfig, train
 from simple_cv_training.utils import load_from_checkpoint, save_to_checkpoint, save_to_comet
@@ -95,6 +96,7 @@ def run_manual_training(cfg: DictConfig) -> None:
 def prepare_manual_training(cfg: DictConfig):
     typed_cfg = validate_experiment_config(cfg)
     _require_manual_checkpoint_format(typed_cfg.checkpoint_file.checkpoint_to_resume)
+    _require_manual_optimization_scope(typed_cfg.optimization.amp.enabled)
 
     logger = configure_logger(
         logged_params=_cfg_to_logged_params(cfg),
@@ -119,9 +121,6 @@ def prepare_manual_training(cfg: DictConfig):
         )
     )
     model = model.to(device)
-    if typed_cfg.GPU.use_dp:
-        # DataParallel remains a manual-runner-only teaching path; Lightning uses GPU.devices instead.
-        model = nn.DataParallel(model)  # type: ignore[assignment]
 
     optimizer = configure_optimizer(
         optimizer_name=typed_cfg.optimizer.optimizer_name,
@@ -160,6 +159,12 @@ def prepare_manual_training(cfg: DictConfig):
         current_val_step = 1
         start_epoch = 0
 
+    # Keep resume compatible with the plain manual .pt model, then apply optimization as a thin adapter.
+    model = apply_torch_compile(model, typed_cfg.optimization.compile)
+    if typed_cfg.GPU.use_dp:
+        # DataParallel is the outermost manual-runner wrapper; Lightning uses GPU.devices instead.
+        model = nn.DataParallel(model)  # type: ignore[assignment]
+
     return (
         logger,
         dataloaders,
@@ -191,3 +196,9 @@ def _require_manual_checkpoint_format(checkpoint_to_resume: str | None) -> None:
         return
     if checkpoint_to_resume.endswith(".ckpt"):
         raise ValueError("main.py uses manual .pt checkpoints. Use main_pl.py to resume a Lightning .ckpt checkpoint.")
+
+
+def _require_manual_optimization_scope(amp_enabled: bool) -> None:
+    if not amp_enabled:
+        return
+    raise ValueError("manual runner does not support optimization.amp; use main_pl.py for AMP.")

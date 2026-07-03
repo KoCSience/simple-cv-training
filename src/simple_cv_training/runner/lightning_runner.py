@@ -10,6 +10,7 @@ from simple_cv_training.config import validate_experiment_config
 from simple_cv_training.dataset import TrainValDataModule
 from simple_cv_training.logger import configure_logger_pl
 from simple_cv_training.model import SimpleLightningModel
+from simple_cv_training.optimization import apply_torch_compile, resolve_trainer_precision
 
 
 def run_lightning_training(cfg: DictConfig) -> None:
@@ -32,8 +33,13 @@ def run_lightning_training(cfg: DictConfig) -> None:
         n_classes=data_module.n_classes,
         exp_name=exp_name,
     )
+    model_lightning = apply_torch_compile(model_lightning, typed_cfg.optimization.compile)
 
-    trainer = build_trainer(cfg, loggers)
+    trainer = build_trainer(
+        cfg=cfg,
+        loggers=loggers,
+        precision=resolve_trainer_precision(typed_cfg.optimization.amp),
+    )
     trainer.fit(
         model=model_lightning,
         datamodule=data_module,
@@ -41,19 +47,23 @@ def run_lightning_training(cfg: DictConfig) -> None:
     )
 
 
-def build_trainer(cfg: DictConfig, loggers) -> pl.Trainer:
-    return pl.Trainer(
-        devices=cfg.GPU.devices,
-        accelerator="gpu",
-        strategy="auto",
-        max_epochs=cfg.training.num_epochs,
-        logger=loggers,
-        log_every_n_steps=cfg.training.log_interval_steps,
-        accumulate_grad_batches=cfg.optimizer.grad_accum,
-        num_sanity_val_steps=0,
-        callbacks=configure_callbacks(),
-        plugins=[TorchSyncBatchNorm()],
-    )
+def build_trainer(cfg: DictConfig, loggers, precision: str | None = None) -> pl.Trainer:
+    trainer_kwargs = {
+        "devices": cfg.GPU.devices,
+        "accelerator": "gpu",
+        "strategy": "auto",
+        "max_epochs": cfg.training.num_epochs,
+        "logger": loggers,
+        "log_every_n_steps": cfg.training.log_interval_steps,
+        "accumulate_grad_batches": cfg.optimizer.grad_accum,
+        "num_sanity_val_steps": 0,
+        "callbacks": configure_callbacks(),
+        "plugins": [TorchSyncBatchNorm()],
+    }
+    if precision is not None:
+        trainer_kwargs["precision"] = precision
+
+    return pl.Trainer(**trainer_kwargs)
 
 
 def _require_cuda_for_training() -> None:

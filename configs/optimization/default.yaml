@@ -1,0 +1,17 @@
+amp:
+  enabled: false
+  precision: bf16-mixed
+  require_bf16_supported: true
+
+compile:
+  enabled: false
+  mode: default
+  fullgraph: false
+  backend: null
+  dynamic: null
+
+benchmark:
+  enabled: true
+
+environment:
+  log: true

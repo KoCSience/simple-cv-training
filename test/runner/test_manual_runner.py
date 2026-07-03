@@ -121,6 +121,106 @@ def test_prepare_manual_training_wraps_model_when_use_dp(monkeypatch) -> None:
     assert isinstance(calls["wrapped_model"], torch.nn.Linear)
 
 
+def test_prepare_manual_training_compiles_before_data_parallel(monkeypatch) -> None:
+    cfg = compose_train_config(
+        [
+            "data=zero_images",
+            "model=zero_output_dummy",
+            "trainer=smoke",
+            "GPU.use_dp=true",
+            "optimization.compile.enabled=true",
+        ]
+    )
+    real_device = torch.device
+    calls = {}
+    base_model = torch.nn.Linear(2, 2)
+    compiled_model = torch.nn.Sequential(base_model)
+
+    class DummyDataParallel(torch.nn.Module):
+        def __init__(self, module):
+            super().__init__()
+            calls["wrapped_model"] = module
+            self.module = module
+
+    monkeypatch.setattr(manual_runner, "_require_cuda_for_manual_training", lambda: None)
+    monkeypatch.setattr(manual_runner.torch, "device", lambda _name: real_device("cpu"))
+    monkeypatch.setattr(manual_runner, "configure_logger", lambda **_kwargs: SimpleNamespace())
+    monkeypatch.setattr(
+        manual_runner,
+        "configure_dataloader",
+        lambda **_kwargs: SimpleNamespace(n_classes=2, train_loader=[], val_loader=[]),
+    )
+    monkeypatch.setattr(manual_runner, "configure_model", lambda _model_config: base_model)
+    monkeypatch.setattr(manual_runner, "configure_optimizer", lambda **_kwargs: SimpleNamespace())
+    monkeypatch.setattr(manual_runner, "configure_scheduler", lambda **_kwargs: SimpleNamespace())
+    monkeypatch.setattr(manual_runner.nn, "DataParallel", DummyDataParallel)
+
+    def apply_torch_compile(model, compile_config):
+        calls["compiled_model"] = model
+        calls["compile_enabled"] = compile_config.enabled
+        return compiled_model
+
+    monkeypatch.setattr(manual_runner, "apply_torch_compile", apply_torch_compile)
+
+    manual_runner.prepare_manual_training(cfg)
+
+    assert calls["compiled_model"] is base_model
+    assert calls["compile_enabled"] is True
+    assert calls["wrapped_model"] is compiled_model
+
+
+def test_prepare_manual_training_loads_checkpoint_before_compile(monkeypatch) -> None:
+    cfg = compose_train_config(
+        [
+            "data=zero_images",
+            "model=zero_output_dummy",
+            "trainer=smoke",
+            "optimization.compile.enabled=true",
+            "checkpoint_file.checkpoint_to_resume=experiment:test/checkpoint",
+        ]
+    )
+    real_device = torch.device
+    calls = []
+    base_model = torch.nn.Linear(2, 2)
+
+    monkeypatch.setattr(manual_runner, "_require_cuda_for_manual_training", lambda: None)
+    monkeypatch.setattr(manual_runner.torch, "device", lambda _name: real_device("cpu"))
+    monkeypatch.setattr(manual_runner, "configure_logger", lambda **_kwargs: SimpleNamespace())
+    monkeypatch.setattr(
+        manual_runner,
+        "configure_dataloader",
+        lambda **_kwargs: SimpleNamespace(n_classes=2, train_loader=[], val_loader=[]),
+    )
+    monkeypatch.setattr(manual_runner, "configure_model", lambda _model_config: base_model)
+    monkeypatch.setattr(manual_runner, "configure_optimizer", lambda **_kwargs: SimpleNamespace())
+    monkeypatch.setattr(manual_runner, "configure_scheduler", lambda **_kwargs: SimpleNamespace())
+
+    def load_from_checkpoint(checkpoint_to_resume, model, optimizer, scheduler, device):
+        calls.append(("load", model))
+        return 2, 3, 4, model, optimizer, scheduler
+
+    def apply_torch_compile(model, _compile_config):
+        calls.append(("compile", model))
+        return model
+
+    monkeypatch.setattr(manual_runner, "load_from_checkpoint", load_from_checkpoint)
+    monkeypatch.setattr(manual_runner, "apply_torch_compile", apply_torch_compile)
+
+    *_, current_train_step, current_val_step, start_epoch = manual_runner.prepare_manual_training(cfg)
+
+    assert calls == [("load", base_model), ("compile", base_model)]
+    assert start_epoch == 2
+    assert current_train_step == 3
+    assert current_val_step == 4
+
+
+def test_prepare_manual_training_rejects_amp() -> None:
+    cfg = compose_train_config(["optimization.amp.enabled=true"])
+
+    with pytest.raises(ValueError, match="main_pl.py for AMP"):
+        manual_runner.prepare_manual_training(cfg)
+
+
 def test_validation_checker_runs_on_interval_and_last_epoch() -> None:
     checker = manual_runner.ValidationChecker(val_interval_epochs=3, num_epochs=10)
 
