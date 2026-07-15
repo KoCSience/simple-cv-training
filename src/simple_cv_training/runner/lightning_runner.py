@@ -33,6 +33,7 @@ def run_lightning_training(cfg: DictConfig) -> None:
         n_classes=data_module.n_classes,
         exp_name=exp_name,
     )
+
     model_lightning = apply_torch_compile(model_lightning, typed_cfg.optimization.compile)
 
     trainer = build_trainer(
