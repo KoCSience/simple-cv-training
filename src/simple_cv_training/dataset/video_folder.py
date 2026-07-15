@@ -2,7 +2,7 @@ import itertools
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Tuple
+from typing import Any
 
 import torch
 from pytorchvideo.data import labeled_video_dataset
@@ -31,14 +31,12 @@ class VideoFolderInfo:
     clips_per_video: int
 
 
-def collate_for_video(batch: Any) -> Tuple[Any, Any]:
+def collate_for_video(batch: Any) -> tuple[Any, Any]:
     batch_dict = torch.utils.data.default_collate(batch)
-    return batch_dict['video'], batch_dict['label']
+    return batch_dict["video"], batch_dict["label"]
 
 
-def video_folder(
-        video_folder_info: VideoFolderInfo
-) -> Tuple[DataLoader, DataLoader, int]:
+def video_folder(video_folder_info: VideoFolderInfo) -> tuple[DataLoader, DataLoader, int]:
     """creating dataloaders for videos in folders by pytorchvideo
 
     Args:
@@ -68,8 +66,7 @@ def video_folder(
     val_dataset = labeled_video_dataset(
         data_path=root_val_dir,
         clip_sampler=ConstantClipsPerVideoSampler(
-            clip_duration=video_folder_info.clip_duration,
-            clips_per_video=video_folder_info.clips_per_video
+            clip_duration=video_folder_info.clip_duration, clips_per_video=video_folder_info.clips_per_video
         ),
         video_sampler=SequentialSampler,
         transform=video_folder_info.val_transform,
@@ -117,9 +114,7 @@ class LimitDataset(torch.utils.data.Dataset):
     def __init__(self, dataset):
         super().__init__()
         self.dataset = dataset
-        self.dataset_iter = itertools.chain.from_iterable(
-            itertools.repeat(iter(dataset), 2)
-        )
+        self.dataset_iter = itertools.chain.from_iterable(itertools.repeat(iter(dataset), 2))
 
     def __getitem__(self, index):
         return next(self.dataset_iter)
