@@ -1,5 +1,5 @@
-import itertools
 import os
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -101,23 +101,61 @@ def video_folder(video_folder_info: VideoFolderInfo) -> tuple[DataLoader, DataLo
 
 
 class LimitDataset(torch.utils.data.Dataset):
-    """
-    To ensure a constant number of samples are retrieved from the dataset we use this
-    LimitDataset wrapper. This is necessary because several of the underlying videos
-    may be corrupted while fetching or decoding, however, we always want the same
-    number of steps per epoch.
+    """Expose a fixed-length, map-style view of an iterable video dataset.
+
+    Some videos can fail while being fetched or decoded. The wrapper therefore allows
+    the underlying dataset to be traversed at most twice while still exposing
+    ``num_videos`` samples to ``DataLoader``. It intentionally keeps the active
+    iterator out of constructor state so that spawn- and forkserver-based workers can
+    pickle the wrapper before creating their worker-local iterator.
+
+    Iteration is implemented with a bounded loop instead of recursion. Fetching N
+    samples takes O(N) time and O(1) additional memory and Python stack space.
 
     https://github.com/facebookresearch/pytorchvideo/blob/f7e7a88a9a04b70cb65a564acfc38538fe71ff7b/tutorials/video_classification_example/train.py#L341
     https://github.com/facebookresearch/pytorchvideo/issues/96
     """
 
-    def __init__(self, dataset):
+    _MAX_DATASET_PASSES = 2
+
+    def __init__(self, dataset: Any) -> None:
+        """Store only pickle-safe source state until sample retrieval starts."""
         super().__init__()
         self.dataset = dataset
-        self.dataset_iter = itertools.chain.from_iterable(itertools.repeat(iter(dataset), 2))
+        self._dataset_iter: Iterator[Any] | None = None
+        self._remaining_dataset_passes = self._MAX_DATASET_PASSES
+        self._previous_index: int | None = None
 
-    def __getitem__(self, index):
-        return next(self.dataset_iter)
+    def __getitem__(self, index: int) -> Any:
+        """Return the next sample while preserving map-style batching semantics."""
+        if self._previous_index is not None and index <= self._previous_index:
+            self._reset_iteration_state()
 
-    def __len__(self):
+        self._previous_index = index
+        return self._next_sample()
+
+    def _next_sample(self) -> Any:
+        """Read one sample, restarting the source at most once after exhaustion."""
+        while self._remaining_dataset_passes > 0:  # loop
+            if self._dataset_iter is None:
+                self._dataset_iter = iter(self.dataset)
+                self._remaining_dataset_passes -= 1  # loop var
+
+            try:
+                return next(self._dataset_iter)
+            except StopIteration:
+                self._dataset_iter = None
+
+        raise RuntimeError(
+            "LimitDataset exhausted the underlying dataset after "
+            f"{self._MAX_DATASET_PASSES} passes before producing the required samples."
+        )
+
+    def _reset_iteration_state(self) -> None:
+        """Reset worker-local state when sequential indices start a new epoch."""
+        self._dataset_iter = None
+        self._remaining_dataset_passes = self._MAX_DATASET_PASSES
+
+    def __len__(self) -> int:
+        """Return the fixed number of samples requested for each epoch."""
         return self.dataset.num_videos
