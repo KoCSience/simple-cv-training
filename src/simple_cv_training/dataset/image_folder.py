@@ -1,6 +1,5 @@
 import os
 from dataclasses import dataclass
-from typing import Tuple
 
 from torch.utils.data import DataLoader
 from torchvision.datasets import ImageFolder
@@ -8,7 +7,7 @@ from torchvision.transforms import v2 as transforms
 
 
 @dataclass
-class ImageFolderInfo():
+class ImageFolderInfo:
     root: str
     train_dir: str
     val_dir: str
@@ -20,7 +19,7 @@ class ImageFolderInfo():
 
 def image_folder(
         image_folder_info: ImageFolderInfo
-) -> Tuple[DataLoader, DataLoader, int]:
+) -> tuple[DataLoader, DataLoader, int]:
     """creating dataloaders for images in folders by torchvision
 
     Args:

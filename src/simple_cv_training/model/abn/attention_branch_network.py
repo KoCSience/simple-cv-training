@@ -1,5 +1,4 @@
 import copy
-from typing import Optional
 
 import torch
 from torch import nn
@@ -24,7 +23,7 @@ class ABNResNet50(ClassificationBaseModel):
     def forward(
         self,
         pixel_values: torch.Tensor,
-        labels: Optional[torch.Tensor] = None,
+        labels: torch.Tensor | None = None,
     ) -> ModelOutput:
 
         perception_branch_logits, attention_branch_logits = \

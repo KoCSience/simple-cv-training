@@ -1,4 +1,3 @@
-from typing import Tuple
 
 # from datetime import datetime
 from comet_ml import Experiment
@@ -11,7 +10,7 @@ def configure_logger_pl(
         model_name: str,
         disable_logging: bool,
         save_dir: str,
-) -> Tuple[Experiment, str]:
+) -> tuple[Experiment, str]:
     """comet logger factory
 
     Args:

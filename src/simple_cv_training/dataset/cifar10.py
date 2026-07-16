@@ -6,7 +6,7 @@ from torchvision.transforms import v2 as transforms
 
 
 @dataclass
-class Cifar10Info():
+class Cifar10Info:
     root: str
     batch_size: int
     num_workers: int

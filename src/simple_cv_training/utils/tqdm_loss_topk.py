@@ -1,4 +1,3 @@
-from typing import Tuple
 
 from tqdm import tqdm
 
@@ -13,8 +12,8 @@ class TqdmLossTopK(tqdm):
         self,
         global_step: int,
         loss: float,
-        topk_values: Tuple[float, ...],
-        topk: Tuple[int, ...] = (1, 5),
+        topk_values: tuple[float, ...],
+        topk: tuple[int, ...] = (1, 5),
     ) -> str:
         assert len(topk) == len(topk_values)
 
@@ -37,8 +36,8 @@ class TqdmLossTopK(tqdm):
 
     def add_topk_to_postfix_str(
         self,
-        topk_values: Tuple[float, ...],
-        topk: Tuple[int, ...]
+        topk_values: tuple[float, ...],
+        topk: tuple[int, ...]
     ) -> None:
         for k, value in zip(topk, topk_values):
             self.postfix_str += f"top{k}={value:6.2f} "

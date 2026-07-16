@@ -1,4 +1,4 @@
-from typing import Literal, Tuple
+from typing import Literal
 
 import torch
 
@@ -49,7 +49,7 @@ class AvgMeterLossTopk(GetMetricsDictMixin):
     def __init__(
         self,
         mode_name: Literal['train', 'val'],
-        topk: Tuple[int, ...] = (1, 5)
+        topk: tuple[int, ...] = (1, 5)
     ):
         """a set of average meters for loss and topk
 
@@ -65,7 +65,7 @@ class AvgMeterLossTopk(GetMetricsDictMixin):
     def update(
         self,
         loss: float | torch.Tensor,
-        topk_values: Tuple[float, ...] | Tuple[torch.Tensor, ...],
+        topk_values: tuple[float, ...] | tuple[torch.Tensor, ...],
         batch_size: int = 1
     ):
         """update average meters with statistics of a single batch

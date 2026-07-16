@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Tuple
 
 import pytorchvideo.transforms as video_transform
 import torch
@@ -40,7 +39,7 @@ def scale_uint8_video_to_unit_float(x: torch.Tensor) -> torch.Tensor:
 
 def transform_video(
         trans_video_info: TransformVideoInfo
-) -> Tuple[image_transform.Compose, image_transform.Compose]:
+) -> tuple[image_transform.Compose, image_transform.Compose]:
     """transform for video clips
 
     Args:
@@ -97,7 +96,7 @@ def transform_video(
 
 def transform_image(
         trans_image_info: TransformImageInfo
-) -> Tuple[image_transform.Compose, image_transform.Compose]:
+) -> tuple[image_transform.Compose, image_transform.Compose]:
     """transform for images
 
     Args:
