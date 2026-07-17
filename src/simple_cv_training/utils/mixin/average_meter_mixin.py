@@ -1,7 +1,4 @@
-
-
 class GetMetricsDictMixin:
-
     def get_meters(self):
         raise NotImplementedError
 
@@ -21,7 +18,7 @@ class GetMetricsDictMixin:
         metrics_dict = {
             f"{mode_name}_loss_step": loss_meter.value,
         }
-        for meter, k in zip(topk_meter, topk):
+        for meter, k in zip(topk_meter, topk, strict=True):
             metrics_dict[f"{mode_name}_top{k}_step"] = meter.value
         return metrics_dict
 
@@ -38,6 +35,6 @@ class GetMetricsDictMixin:
         metrics_dict = {
             f"{mode_name}_loss_epoch": loss_meter.avg,
         }
-        for meter, k in zip(topk_meter, topk):
+        for meter, k in zip(topk_meter, topk, strict=True):
             metrics_dict[f"{mode_name}_top{k}_epoch"] = meter.avg
         return metrics_dict
