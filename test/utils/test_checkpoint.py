@@ -128,8 +128,9 @@ def test_checkpoint_save_load(  # noqa: FNE003 FNE004
 
     assert id(loaded_model) != id(model)
 
-    # below is "assert loaded_model == model"
-    for p1, p2 in zip(loaded_model.named_parameters(), model.named_parameters(), strict=False):
+    # Compare every parameter: DataParallel may change name prefixes, but it
+    # must not hide missing or extra parameters through zip truncation.
+    for p1, p2 in zip(loaded_model.named_parameters(), model.named_parameters(), strict=True):
         # instead of assert p1[0] == p2[0], below compares "conv1" == "module.conv1"
         assert p1[0] in p2[0] or p2[0] in p1[0], "layer names are different"
 
