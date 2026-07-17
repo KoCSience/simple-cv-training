@@ -16,6 +16,25 @@ uv run pytest
 uv run python -m pytest
 ```
 
+## 静的解析
+
+Ruffによるlintとformat確認は次のように実行します。`uvx` はリポジトリの `pyproject.toml` にあるRuff設定を読み込みます。
+
+```bash
+uvx ruff check .
+uvx ruff format --check .
+```
+
+### `zip(strict=...)` の方針
+
+このプロジェクトはPython 3.12以上を対象としているため、Python 3.10で追加された `zip()` の `strict` 引数を使用できます。RuffのB905を単に抑制するのではなく、組み合わせるデータの契約に応じて次のように指定します。
+
+- 要素が一対一で対応すべき場合は `strict=True` を指定し、長さの不一致を `ValueError` として検出する。
+- 短いiterableに合わせて残りを切り捨てることが仕様である場合だけ `strict=False` を指定し、その理由をdocstringまたはコメントに残す。
+- サポート対象外のPython 3.9以前との互換性を理由に、`# noqa: B905` や独自の互換関数は追加しない。
+
+Pythonの対応範囲とRuffのtarget versionはすでに `pyproject.toml` に定義されているため、この方針の適用だけでは `pyproject.toml` や `uv.lock` の変更は必要ありません。
+
 ## GPUテスト
 
 ```bash
