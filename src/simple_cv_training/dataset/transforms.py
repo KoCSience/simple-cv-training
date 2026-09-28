@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Tuple
 
 import pytorchvideo.transforms as video_transform
 import torch
@@ -29,9 +28,18 @@ def identity(x):
     return x
 
 
+def scale_uint8_video_to_unit_float(x: torch.Tensor) -> torch.Tensor:
+    """Scale video tensor from [0, 255] to [0, 1].
+
+    This function is defined at module top level so that PyTorch DataLoader
+    worker processes can pickle transforms when num_workers > 0.
+    """
+    return x / 255.0
+
+
 def transform_video(
         trans_video_info: TransformVideoInfo
-) -> Tuple[image_transform.Compose, image_transform.Compose]:
+) -> tuple[image_transform.Compose, image_transform.Compose]:
     """transform for video clips
 
     Args:
@@ -48,7 +56,7 @@ def transform_video(
                 video_transform.UniformTemporalSubsample(
                     trans_video_info.frames_per_clip
                 ),
-                image_transform.Lambda(lambda x: x / 255.0),
+                image_transform.Lambda(scale_uint8_video_to_unit_float),
                 video_transform.Normalize(
                     [0.45, 0.45, 0.45], [0.225, 0.225, 0.225]
                 ),
@@ -70,7 +78,7 @@ def transform_video(
                 video_transform.UniformTemporalSubsample(
                     trans_video_info.frames_per_clip
                 ),
-                image_transform.Lambda(lambda x: x / 255.0),
+                image_transform.Lambda(scale_uint8_video_to_unit_float),
                 video_transform.Normalize(
                     [0.45, 0.45, 0.45], [0.225, 0.225, 0.225]
                 ),
@@ -88,7 +96,7 @@ def transform_video(
 
 def transform_image(
         trans_image_info: TransformImageInfo
-) -> Tuple[image_transform.Compose, image_transform.Compose]:
+) -> tuple[image_transform.Compose, image_transform.Compose]:
     """transform for images
 
     Args:

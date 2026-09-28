@@ -1,4 +1,4 @@
-from typing import Any, NamedTuple, Optional
+from typing import Any, NamedTuple
 
 import torch
 from torch import nn
@@ -8,7 +8,7 @@ from .model_config import ModelConfig
 
 class ModelOutput(NamedTuple):
     logits: torch.Tensor
-    loss: Optional[torch.Tensor] = None
+    loss: torch.Tensor | None = None
 
 
 class ClassificationBaseModel(nn.Module):
@@ -26,7 +26,7 @@ class ClassificationBaseModel(nn.Module):
     def forward(
         self,
         pixel_values: torch.Tensor,
-        labels: Optional[torch.Tensor] = None,
+        labels: torch.Tensor | None = None,
     ) -> ModelOutput:
 
         logits = self.model(pixel_values)

@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Tuple
 
 import numpy as np
 from torch.utils.data import DataLoader, Dataset
@@ -7,7 +6,7 @@ from torchvision.transforms import v2 as transforms
 
 
 @dataclass
-class ZeroImageInfo():
+class ZeroImageInfo:
     batch_size: int
     num_workers: int
     transform: transforms
@@ -36,7 +35,7 @@ class ZeroImageDataset(Dataset):
 
 def zero_images(
         zero_image_info: ZeroImageInfo
-) -> Tuple[DataLoader, DataLoader, int]:
+) -> tuple[DataLoader, DataLoader, int]:
 
     zero_image_dataset_dict = {
         "dataset_size": zero_image_info.dataset_size,

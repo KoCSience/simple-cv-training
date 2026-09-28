@@ -1,4 +1,3 @@
-from typing import Tuple
 
 import torch
 
@@ -6,8 +5,8 @@ import torch
 def compute_topk_accuracy(
     logits: torch.Tensor,
     labels: torch.Tensor,
-    topk: Tuple[int, ...] = (1,)
-) -> Tuple[float, ...]:
+    topk: tuple[int, ...] = (1,)
+) -> tuple[float, ...]:
     """Computes the accuracy over top-k predictions for the specified values of k
     https://github.com/pytorch/examples/blob/cedca7729fef11c91e28099a0e45d7e98d03b66d/imagenet/main.py#L411
 

@@ -1,4 +1,3 @@
-from typing import Optional
 
 import torch
 from torch import nn
@@ -20,7 +19,7 @@ class ZeroOutputModel(ClassificationBaseModel):
     def forward(
         self,
         pixel_values: torch.Tensor,
-        labels: Optional[torch.Tensor] = None,
+        labels: torch.Tensor | None = None,
     ) -> ModelOutput:
         batch_size = pixel_values.shape[0]
         device = pixel_values.device

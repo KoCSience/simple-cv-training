@@ -1,4 +1,3 @@
-from typing import Optional
 
 import torch
 from transformers import ViTForImageClassification
@@ -23,7 +22,7 @@ class ViTb(ClassificationBaseModel):
     def forward(
         self,
         pixel_values: torch.Tensor,
-        labels: Optional[torch.Tensor] = None,
+        labels: torch.Tensor | None = None,
     ) -> ModelOutput:
 
         output = self.model(
