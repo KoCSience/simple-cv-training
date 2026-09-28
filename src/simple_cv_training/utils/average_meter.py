@@ -15,18 +15,13 @@ class AverageMeter:
     """
 
     def __init__(self):
-        """average meter
-        """
+        """average meter"""
         self.value = 0
         self.avg = 0
         self.sum = 0
         self.count = 0
 
-    def update(
-        self,
-        value: float | torch.Tensor,
-        n: int = 1
-    ):
+    def update(self, value: float | torch.Tensor, n: int = 1):
         """update the statistics
 
         Args:
@@ -42,16 +37,10 @@ class AverageMeter:
 
 
 class AvgMeterLossTopk(GetMetricsDictMixin):
-    """average meter set for loss and top1/top5
+    """Track loss and top-k metrics while preserving their one-to-one mapping."""
 
-    """
-
-    def __init__(
-        self,
-        mode_name: Literal['train', 'val'],
-        topk: tuple[int, ...] = (1, 5)
-    ):
-        """a set of average meters for loss and topk
+    def __init__(self, mode_name: Literal["train", "val"], topk: tuple[int, ...] = (1, 5)):
+        """Create a loss meter and one meter for each configured top-k value.
 
         Args:
             mode_name (Literal['train', 'val']): prefix
@@ -63,20 +52,27 @@ class AvgMeterLossTopk(GetMetricsDictMixin):
         self.topk_meters = [AverageMeter() for _ in topk]
 
     def update(
-        self,
-        loss: float | torch.Tensor,
-        topk_values: tuple[float, ...] | tuple[torch.Tensor, ...],
-        batch_size: int = 1
+        self, loss: float | torch.Tensor, topk_values: tuple[float, ...] | tuple[torch.Tensor, ...], batch_size: int = 1
     ):
-        """update average meters with statistics of a single batch
+        """Update all batch statistics after validating the top-k correspondence.
 
         Args:
             loss (float | torch.Tensor): a batch loss
             topk_values (Tuple[float, ...] | Tuple[torch.Tensor, ...]): a batch topk values
             batch_size (int, optional): batch size for the loss. Defaults to 1.
+
+        Raises:
+            ValueError: If ``topk_values`` does not contain exactly one value
+                for each configured top-k metric. Validation happens before any
+                meter is updated to avoid leaving partially updated statistics.
         """
+        if len(topk_values) != len(self.topk):
+            raise ValueError(
+                f"topk_values must contain {len(self.topk)} values to match topk={self.topk}; got {len(topk_values)}"
+            )
+
         self.loss_meter.update(loss, batch_size)
-        for meter, value in zip(self.topk_meters, topk_values):
+        for meter, value in zip(self.topk_meters, topk_values, strict=True):
             meter.update(value, batch_size)  # type: ignore[arg-type]
 
     def get_meters(self):
